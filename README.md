@@ -1,5 +1,7 @@
 # OpenSpyro
 
+![Spyro the Dragon screenshot from Dream Weavers](https://www.giantbomb.com/a/uploads/scale_medium/8/82962/1666831-dreamweavers.jpg)
+
 ## Introduction
 
 Welcome to the Spyro the Dragon PC port project called OpenSpyro! OpenSpyro is an open-source initiative driven by a passionate programmer and fan of the original Spyro the Dragon trilogy on Playstation. The project is focused on reverse-engineering and adapting the game to run natively on PC systems. I aim to provide an authentic experience that stays true to the original while leveraging the capabilities of modern hardware.
