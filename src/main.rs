@@ -1,5 +1,5 @@
 use std::env;
-use std::fs::File;
+use std::fs::{self, File};
 
 use rom_manager::CDROMXAVolume;
 
@@ -160,8 +160,73 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("ROM validity checks passed. ROM includes valid data.");
             Ok(())
         }
+        // Extracts a file from a given ROM to a given extract path.
+        ("rom-extract", [rom_path, entry_input_path, entry_extract_path]) => {
+            // Initialize the volume based on given ROM file path.
+            let volume_file = File::open(rom_path)
+                .map_err(|_| format!("Failed to open given ROM file in path \"{}\".", rom_path))?;
+            let mut volume = CDROMXAVolume::new(volume_file);
+
+            // Read the volume descriptor locations from the volume.
+            let vd_locations = volume.read_volume_descriptor_locations().map_err(|e| {
+                format!(
+                    "ROM file given has invalid data: failed to read volume descriptor locations: {}",
+                    e.to_string()
+                )
+            })?;
+
+            let pvd = volume
+                .read_primary_volume_descriptor(&vd_locations)
+                .map_err(|e| {
+                    format!(
+                    "ROM file given has invalid data: failed to read primary volume descriptor: {}",
+                    e.to_string()
+                )
+                })?;
+
+            // Read the root directory record from the volume and  ensure it has all the expected values.
+            let root_record = &pvd.directory_record_for_root_directory;
+
+            // Read the sub-records, that is, directories and files by the root directory record
+            let sub_records = volume
+                .read_directory_records(
+                    &pvd.directory_record_for_root_directory,
+                    pvd.logical_block_size,
+                ).map_err(|err| format!("ROM file given has invalid data: failed to read sub-records by root directory: {}", err.to_string()))?;
+
+            // Find the entry in the root directory record that matches the given entry path.
+            let entry_record = sub_records
+                .iter()
+                .find(|r| r.file_identifier_as_string() == *entry_input_path)
+                .ok_or_else(|| {
+                    format!(
+                        "ROM file given does not contain the given entry path \"{}\".",
+                        entry_input_path
+                    )
+                })?;
+
+            // Read the entry record data and write it to the given extract path.
+            let entry_record_data =
+                volume.read_directory_record_data(entry_record, pvd.logical_block_size)?;
+
+            fs::write(entry_extract_path, entry_record_data).map_err(|err| {
+                format!(
+                    "Failed to write extracted file from ROM to path \"{}\": {}",
+                    entry_extract_path,
+                    err.to_string()
+                )
+            })?;
+
+            println!("ROM path: \"{}\"", rom_path);
+            println!(
+                "Successfully extracted file \"{}\" from ROM to \"{}\"",
+                entry_input_path, entry_extract_path
+            );
+            Ok(())
+        }
+        // Failure happened.
         _ => Err(format!(
-            "No supported command provided (command \"{}\" given).",
+            "No supported command or enough arguments for it provided (command \"{}\" given).",
             command
         )
         .into()),
