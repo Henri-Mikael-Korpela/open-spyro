@@ -184,9 +184,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
                 })?;
 
-            // Read the root directory record from the volume and  ensure it has all the expected values.
-            let root_record = &pvd.directory_record_for_root_directory;
-
             // Read the sub-records, that is, directories and files by the root directory record
             let sub_records = volume
                 .read_directory_records(
@@ -252,9 +249,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     e.to_string()
                 )
                 })?;
-
-            // Read the root directory record from the volume and  ensure it has all the expected values.
-            let root_record = &pvd.directory_record_for_root_directory;
 
             // Read the sub-records, that is, directories and files by the root directory record
             let sub_records = volume
