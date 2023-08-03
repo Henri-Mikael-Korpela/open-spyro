@@ -224,6 +224,89 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
             Ok(())
         }
+        // Replaces a file in a given ROM with a given input file.
+        ("rom-replace", [rom_path, input_file_path, output_file_path]) => {
+            use std::fs::OpenOptions;
+
+            // Initialize the volume based on given ROM file path.
+            let volume_file = OpenOptions::new()
+                .read(true)
+                .write(true)
+                .open(rom_path)
+                .map_err(|_| format!("Failed to open given ROM file in path \"{}\".", rom_path))?;
+            let mut volume = CDROMXAVolume::new(volume_file);
+
+            // Read the volume descriptor locations from the volume.
+            let vd_locations = volume.read_volume_descriptor_locations().map_err(|e| {
+                format!(
+                    "ROM file given has invalid data: failed to read volume descriptor locations: {}",
+                    e.to_string()
+                )
+            })?;
+
+            let pvd = volume
+                .read_primary_volume_descriptor(&vd_locations)
+                .map_err(|e| {
+                    format!(
+                    "ROM file given has invalid data: failed to read primary volume descriptor: {}",
+                    e.to_string()
+                )
+                })?;
+
+            // Read the root directory record from the volume and  ensure it has all the expected values.
+            let root_record = &pvd.directory_record_for_root_directory;
+
+            // Read the sub-records, that is, directories and files by the root directory record
+            let sub_records = volume
+                .read_directory_records(
+                    &pvd.directory_record_for_root_directory,
+                    pvd.logical_block_size,
+                ).map_err(|err| format!("ROM file given has invalid data: failed to read sub-records by root directory: {}", err.to_string()))?;
+
+            // Find the entry in the root directory record that matches the given entry path.
+            let entry_record = sub_records
+                .iter()
+                .find(|r| r.file_identifier_as_string() == *output_file_path)
+                .ok_or_else(|| {
+                    format!(
+                        "ROM file given does not contain the given entry path \"{}\".",
+                        output_file_path
+                    )
+                })?;
+
+            // Read the input file content into buffer.
+            let input_file_content = {
+                use std::io::Read;
+
+                let mut input_file = File::open(input_file_path).map_err(|_| {
+                    format!(
+                        "Failed to open given input file in path \"{}\".",
+                        input_file_path
+                    )
+                })?;
+
+                let mut input_file_buffer = Vec::new();
+                input_file
+                    .read_to_end(&mut input_file_buffer)
+                    .map_err(|_| {
+                        format!(
+                            "Failed to read entire content of the input file in path \"{}\".",
+                            input_file_path
+                        )
+                    })?;
+                input_file_buffer
+            };
+
+            // Replace the entry record content with the input file content.
+            volume.replace_file(entry_record, pvd.logical_block_size, &input_file_content)?;
+
+            println!("ROM path: \"{}\"", rom_path);
+            println!(
+                "Replaced file \"{}\" in ROM successfully.",
+                output_file_path
+            );
+            Ok(())
+        }
         // Failure happened.
         _ => Err(format!(
             "No supported command or enough arguments for it provided (command \"{}\" given).",

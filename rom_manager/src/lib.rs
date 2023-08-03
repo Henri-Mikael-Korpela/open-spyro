@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{BufReader, Read, Seek, SeekFrom},
+    io::{BufReader, BufWriter, Read, Seek, SeekFrom, Write},
     ops::BitAnd,
 };
 
@@ -532,6 +532,7 @@ impl CDROMXAVolume {
         directory_record: &DirectoryRecord,
         logical_block_size: i16,
     ) -> Result<Vec<u8>, String> {
+        // If the directory record is not a file, then it does not have data and cannot be read
         if directory_record.is_dir() {
             return Err(String::from(
                 "Failed to read directory record data into a byte buffer: directory record is not a file.",
@@ -729,6 +730,77 @@ impl CDROMXAVolume {
 
         Ok(result)
     }
+    /// Writes to an already existing file on the volume.
+    pub fn replace_file(
+        &mut self,
+        directory_record: &DirectoryRecord,
+        logical_block_size: i16,
+        content: &Vec<u8>,
+    ) -> Result<(), String> {
+        let mut writer = BufWriter::new(&self.file);
+
+        let sector_size = Sector::get_size_by_logical_block_size(logical_block_size);
+        let sector_base_offset = directory_record.location_of_extent as u64 * sector_size as u64;
+
+        // Go to the beginning of the sector containing the file content with XA header bytes.
+        // One could also seek the beginning of the sector + XA header bytes length (bytes to
+        // skip), but this would make iteration through the sectors below more difficult to formulate.
+        writer
+            .seek(SeekFrom::Start(sector_base_offset))
+            .map_err(|err| {
+                format!(
+                    "Failed to set seek for file on ROM by offset {}: {}",
+                    sector_base_offset, err
+                )
+            })?;
+
+        let sector_count =
+            f32::ceil(directory_record.data_length as f32 / sector_size as f32) as usize;
+
+        let data_len = directory_record.data_length as usize;
+
+        let mut data_bytes_written = 0_usize;
+
+        for i in 0..sector_count {
+            // Skip the XA header bytes so that data is not written to them.
+            let sector_data_offset = sector_base_offset
+                + Sector::XA_HEADER_BYTE_COUNT as u64
+                + i as u64 * sector_size as u64;
+            writer
+                .seek(SeekFrom::Start(sector_data_offset))
+                .map_err(|err| {
+                    format!(
+                        "Failed to set seek for file on ROM by offset {}: {}",
+                        sector_data_offset, err
+                    )
+                })?;
+
+            // A sector size contains XA header and end bytes.
+            // The sector size for writing should not includes length of those bytes,
+            // so both of those lengths need to be subtracted.
+            let sector_size_for_write = sector_size - Sector::XA_DATA_BYTE_COUNT as usize;
+
+            let data_bytes_to_write = if data_bytes_written + sector_size_for_write > data_len {
+                data_len - data_bytes_written
+            } else {
+                sector_size_for_write
+            };
+
+            let bytes_from_content =
+                &content[data_bytes_written..data_bytes_written + data_bytes_to_write];
+
+            writer.write_all(bytes_from_content).map_err(|err| {
+                format!(
+                    "Failed to write file on ROM by offset {}: {}",
+                    sector_data_offset, err
+                )
+            })?;
+
+            data_bytes_written += data_bytes_to_write;
+        }
+
+        Ok(())
+    }
 }
 
 pub struct Sector {
@@ -736,6 +808,7 @@ pub struct Sector {
 }
 impl Sector {
     const XA_HEADER_BYTE_COUNT: i64 = 24;
+    /// Includes length of XA header bytes ([XA_HEADER_BYTE_COUNT]) and XA last bytes ([XA_DATA_LAST_BYTES_COUNT]) together.
     const XA_DATA_BYTE_COUNT: i64 = 304;
     const XA_DATA_LAST_BYTES_COUNT: i64 = Self::XA_DATA_BYTE_COUNT - Self::XA_HEADER_BYTE_COUNT;
     /// Logical sector size shall not be any larger than a logical block size.
@@ -793,6 +866,7 @@ impl Sector {
         assert_eq!(data, *old_data);
         Ok(Sector { data })
     }
+    #[inline]
     pub fn get_size_by_logical_block_size(logical_block_size: i16) -> usize {
         logical_block_size as usize + Self::XA_DATA_BYTE_COUNT as usize
     }
