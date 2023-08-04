@@ -9,9 +9,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 
 [[package]]
+name = "mips"
+version = "0.1.0"
+
+[[package]]
 name = "open-spyro"
 version = "0.1.0"
 dependencies = [
+ "mips",
+ "ps1exe",
  "rom_manager",
 ]
 
@@ -23,6 +29,10 @@ checksum = "18fb31db3f9bddb2ea821cde30a9f70117e3f119938b5ee630b7403aa6e2ead9"
 dependencies = [
  "unicode-ident",
 ]
+
+[[package]]
+name = "ps1exe"
+version = "0.1.0"
 
 [[package]]
 name = "quote"

@@ -1,6 +1,9 @@
 use std::env;
-use std::fs::{self, File};
+use std::fs::{self, File, OpenOptions};
+use std::io::Read;
 
+use mips::{parse_nodes, CustomCommand, NodeKind};
+use ps1exe::{PS1Exe, PS1ExeWriter};
 use rom_manager::CDROMXAVolume;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -15,6 +18,85 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok_or_else(|| "No command provided as a command line argument.")?;
 
     match (command.as_str(), &args[2..]) {
+        // Assemble MIPS assembly code from a given text file into a Playstation executable
+        ("ps1exe-assemble", [input_file_path, output_ps1_exe_file_path]) => {
+            let mut input_file = File::open(input_file_path).map_err(|_| {
+                format!(
+                    "Failed to open given input MIPS assembly code file in path \"{}\".",
+                    input_file_path
+                )
+            })?;
+
+            let mut input_file_content = String::new();
+            input_file
+                .read_to_string(&mut input_file_content)
+                .map_err(|_| {
+                    format!(
+                        "Failed to read given input MIPS assembly code file in path \"{}\".",
+                        input_file_path
+                    )
+                })?;
+
+            let nodes = parse_nodes(&input_file_content).map_err(|e| {
+                format!(
+                    "Failed to parse given input MIPS assembly code file in path \"{}\": {}",
+                    input_file_path,
+                    e.to_string()
+                )
+            })?;
+
+            for node in nodes.iter() {
+                match &node.kind {
+                    NodeKind::CustomCommand(command) => match command {
+                        CustomCommand::At(address) => {
+                            println!("Address: {}", address);
+                        }
+                    },
+                    NodeKind::Instruction(instruction) => {
+                        println!("Instruction: {}", instruction.to_instruction());
+                    }
+                    NodeKind::Label(label) => {
+                        println!("Label: {:?}", label);
+                    }
+                }
+            }
+
+            let mut ps1_exe = PS1Exe::from_file_path(output_ps1_exe_file_path)?;
+
+            // Print Playstation executable header information
+            println!(
+                "PS1 EXE destination address in RAM: 0x{:X}",
+                ps1_exe.destination_address_in_ram
+            );
+            println!("PS1 EXE file size: {}", ps1_exe.file_size);
+            println!("PS1 EXE initial GP R28: 0x{:X}", ps1_exe.initial_gp_r28);
+            println!("PS1 EXE initial PC value: 0x{:X}", ps1_exe.initial_pc);
+            println!("PS1 EXE ASCII marker: {}", ps1_exe.ascii_marker);
+
+            let mut ps1_exe_writer = PS1ExeWriter::new(&mut ps1_exe);
+
+            let mut current_address = 0;
+
+            for node in nodes.iter() {
+                match &node.kind {
+                    NodeKind::CustomCommand(command) => match command {
+                        CustomCommand::At(address) => {
+                            current_address = *address - 4;
+                        }
+                    },
+                    NodeKind::Instruction(instruction) => {
+                        current_address += 4;
+                        println!("Instruction to write: {}", instruction.to_instruction());
+                        ps1_exe_writer.write_code(current_address, &instruction.to_le_bytes());
+                    }
+                    _ => {}
+                }
+            }
+
+            ps1_exe_writer.write_into_file("/home/henri/hobbies/open-spyro/tmp/SCUS_942.28_mod")?;
+
+            Ok(())
+        }
         // Check the given ROM file for validity.
         ("rom-check", [rom_path]) => {
             // Initialize the volume based on given ROM file path.
@@ -223,8 +305,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         // Replaces a file in a given ROM with a given input file.
         ("rom-replace", [rom_path, input_file_path, output_file_path]) => {
-            use std::fs::OpenOptions;
-
             // Initialize the volume based on given ROM file path.
             let volume_file = OpenOptions::new()
                 .read(true)
@@ -270,8 +350,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // Read the input file content into buffer.
             let input_file_content = {
-                use std::io::Read;
-
                 let mut input_file = File::open(input_file_path).map_err(|_| {
                     format!(
                         "Failed to open given input file in path \"{}\".",
