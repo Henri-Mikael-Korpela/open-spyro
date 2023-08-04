@@ -33,6 +33,9 @@ dependencies = [
 [[package]]
 name = "ps1exe"
 version = "0.1.0"
+dependencies = [
+ "mips",
+]
 
 [[package]]
 name = "quote"

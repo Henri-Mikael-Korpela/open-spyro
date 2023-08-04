@@ -3,7 +3,7 @@ use std::fs::{self, File, OpenOptions};
 use std::io::Read;
 
 use mips::{parse_nodes, CustomCommand, NodeKind};
-use ps1exe::{PS1Exe, PS1ExeWriter};
+use ps1exe::{PS1Exe, PS1ExeReader, PS1ExeWriter};
 use rom_manager::CDROMXAVolume;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -45,22 +45,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
             })?;
 
-            for node in nodes.iter() {
-                match &node.kind {
-                    NodeKind::CustomCommand(command) => match command {
-                        CustomCommand::At(address) => {
-                            println!("Address: {}", address);
-                        }
-                    },
-                    NodeKind::Instruction(instruction) => {
-                        println!("Instruction: {}", instruction.to_instruction());
-                    }
-                    NodeKind::Label(label) => {
-                        println!("Label: {:?}", label);
-                    }
-                }
-            }
-
             let mut ps1_exe = PS1Exe::from_file_path(output_ps1_exe_file_path)?;
 
             // Print Playstation executable header information
@@ -94,6 +78,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             ps1_exe_writer.write_into_file("/home/henri/hobbies/open-spyro/tmp/SCUS_942.28_mod")?;
+
+            Ok(())
+        }
+        // Disassemble MIPS assembly code from given address (as hexadecimal) memory onwards
+        ("ps1exe-disassemble", [input_ps1_exe_file_path, address_in_memory, instruction_count]) => {
+            let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
+
+            let address_in_memory = u64::from_str_radix(address_in_memory, 16).map_err(|_| {
+                format!(
+                    "Failed to parse given address in memory \"{}\" as a hexadecimal number.",
+                    address_in_memory
+                )
+            })?;
+
+            let instruction_count = instruction_count.parse::<usize>().map_err(|_| {
+                format!(
+                    "Failed to parse given instruction count \"{}\" as a number.",
+                    instruction_count
+                )
+            })?;
+
+            let ps1_exe_reader = PS1ExeReader::new(&ps1_exe);
+            ps1_exe_reader.disassemble_code_at(address_in_memory, instruction_count);
 
             Ok(())
         }

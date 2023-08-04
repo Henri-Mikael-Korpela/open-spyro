@@ -153,6 +153,26 @@ impl PS1Exe {
     }
 }
 
+pub struct PS1ExeReader<'a> {
+    exe: &'a PS1Exe,
+}
+impl<'a> PS1ExeReader<'a> {
+    pub fn disassemble_code_at(&self, address_in_memory: u64, instruction_count: usize) {
+        let address = self.exe.get_address_by_address_in_memory(address_in_memory);
+        const INSTRUCTION_LEN_IN_BYTES: usize = 4;
+        for i in 0..instruction_count {
+            let instruction_bytes = &self.exe.data[address + i * INSTRUCTION_LEN_IN_BYTES
+                ..address + (i + 1) * INSTRUCTION_LEN_IN_BYTES];
+            let instruction_bytes: &[u8; 4] = instruction_bytes.try_into().unwrap();
+            let instruction = mips::Instruction::parse_from_le_bytes(instruction_bytes);
+            println!("{}", instruction.to_instruction());
+        }
+    }
+    pub fn new(exe: &'a PS1Exe) -> Self {
+        Self { exe }
+    }
+}
+
 pub struct PS1ExeWriter<'a> {
     exe: &'a mut PS1Exe,
 }
