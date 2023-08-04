@@ -251,6 +251,21 @@ impl Instruction {
             "sltu" => define_r_instruction_parse!(parts, 0b101011), // Funct is 43
             "sub" => define_r_instruction_parse!(parts, 0b100010), // Funct is 34
             "subu" => define_r_instruction_parse!(parts, 0b100011), // Funct is 35
+            "sw" => match parts[1..] {
+                [rt, immediate, rs] => {
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let immediate =
+                        parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
+                    Ok(Instruction::ISigned {
+                        opcode: 0b101011, // Opcode is 43
+                        rs,
+                        rt,
+                        immediate,
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             _ => panic!("Unknown instruction \"{}\"", parts[0]),
         }
     }
@@ -280,6 +295,7 @@ impl Instruction {
                     0b001111 => format!("lui {}, {}", rt, immediate),
                     0b100011 => format!("lw {}, {}({})", rt, immediate, rs),
                     0b001010 => format!("slti {}, {}, {}", rt, rs, immediate),
+                    0b101011 => format!("sw {}, {}({})", rt, immediate, rs),
                     _ => panic!("Unknown opcode \"{}\" for I instruction", opcode),
                 }
             }
