@@ -7,216 +7,14 @@ use std::{
 use strum::IntoEnumIterator;
 use strum::{EnumIter, FromRepr};
 
+mod byte_range;
+mod fields;
+
+use byte_range::ByteRange;
+
 fn write_bytes_into(data: &mut [u8], begin: usize, value: &[u8]) {
     for (i, b) in data[begin..begin + value.len()].iter_mut().enumerate() {
         *b = value[i];
-    }
-}
-
-pub trait FromBothEndian {
-    fn from_both_endian(value: &[u8]) -> Self;
-}
-impl FromBothEndian for i16 {
-    fn from_both_endian(value: &[u8]) -> Self {
-        // The first half of bytes contains value in little endian format,
-        // the second half of bytes contains value in big endian format.
-        // One only needs to read either or.
-        // This implementation handles bytes in the little endian format.
-        let slice: [u8; 2] = value[0..2].try_into().unwrap();
-        Self::from_le_bytes(slice)
-
-        // In case someone wants to read bytes in the big endian format...
-        /*let slice: [u8; 2] = buf[2..4].try_into().unwrap();
-        Self::from_be_bytes(slice)*/
-    }
-}
-impl FromBothEndian for i32 {
-    fn from_both_endian(value: &[u8]) -> Self {
-        // The first half of bytes contains value in little endian format,
-        // the second half of bytes contains value in big endian format.
-        // One only needs to read either or.
-        // This implementation handles bytes in the little endian format.
-        let slice: [u8; 4] = value[0..4].try_into().unwrap();
-        Self::from_le_bytes(slice)
-
-        // In case someone wants to read bytes in the big endian format...
-        /*let slice: [u8; 4] = buf[4..8].try_into().unwrap();
-        Self::from_be_bytes(slice)*/
-    }
-}
-
-pub trait FromLittleEndian {
-    fn from_little_endian(value: &[u8]) -> Self;
-}
-impl FromLittleEndian for i32 {
-    fn from_little_endian(value: &[u8]) -> Self {
-        let slice = value[0..4].try_into().unwrap();
-        Self::from_le_bytes(slice)
-    }
-}
-
-pub trait ByteCount {
-    const BYTES: usize;
-}
-impl ByteCount for i16 {
-    const BYTES: usize = Self::BITS as usize / 8;
-}
-impl ByteCount for i32 {
-    const BYTES: usize = Self::BITS as usize / 8;
-}
-
-#[derive(Debug)]
-pub struct ByteRange {
-    pub begin: usize,
-    pub end: usize,
-}
-impl ByteRange {
-    pub const fn get_length_in_bytes(&self) -> usize {
-        self.end - self.begin
-    }
-    pub const fn new(begin: usize, end: usize) -> Self {
-        Self { begin, end }
-    }
-    pub fn read_as_bytes<const SIZE: usize>(&self, buf: &[u8]) -> [u8; SIZE] {
-        buf[self.begin..self.end].try_into().unwrap()
-    }
-    /// Reads bytes including both endians, the little and the big endian (in that order).
-    #[inline]
-    pub fn read_as_both_endian<T>(&self, buf: &[u8]) -> T
-    where
-        T: FromBothEndian + ByteCount,
-    {
-        T::from_both_endian(&buf[self.begin..self.begin + T::BYTES])
-    }
-    #[inline]
-    pub fn read_as_little_endian<T>(&self, buf: &[u8]) -> T
-    where
-        T: FromLittleEndian + ByteCount,
-    {
-        T::from_little_endian(&buf[self.begin..self.begin + T::BYTES])
-    }
-    #[inline]
-    /**
-     * Converts bytes into a string. Special empty characters with value 32 are also removed.
-     */
-    pub fn read_as_string(&self, buf: &[u8]) -> String {
-        const SPECIAL_EMPTY_CHAR: u8 = 32;
-        let slice = buf[self.begin..self.end]
-            .iter()
-            .filter(|b| **b != SPECIAL_EMPTY_CHAR)
-            .map(|b| *b)
-            .collect::<Vec<_>>();
-        std::str::from_utf8(&slice[..]).unwrap().to_string()
-    }
-}
-
-pub struct BothEndianI16Field<'a>(&'a ByteRange);
-impl<'a> BothEndianI16Field<'a> {
-    pub fn with_range(range: &'a ByteRange) -> Self {
-        Self(&range)
-    }
-    pub fn write_into(&self, data: &mut [u8], begin_in_data: usize, value_to_write: i16) {
-        for (i, b) in value_to_write.to_le_bytes().iter().enumerate() {
-            data[begin_in_data + self.0.begin + i] = *b;
-        }
-        for (i, b) in value_to_write.to_be_bytes().iter().enumerate() {
-            data[begin_in_data + self.0.begin + i16::BYTES + i] = *b;
-        }
-    }
-}
-
-#[test]
-fn write_into_array_as_both_endian_i16() {
-    let mut data = [0_u8; 4];
-
-    let field = BothEndianI16Field::with_range(&ByteRange { begin: 0, end: 1 });
-    field.write_into(&mut data, 0, 16);
-
-    assert_eq!(data, [16, 0, 0, 16]);
-}
-
-pub struct BothEndianI32Field<'a>(pub &'a ByteRange);
-impl<'a> BothEndianI32Field<'a> {
-    pub fn with_range(range: &'a ByteRange) -> Self {
-        Self(&range)
-    }
-    pub fn write_into(&self, data: &mut [u8], begin_in_data: usize, value_to_write: i32) {
-        for (i, b) in value_to_write.to_le_bytes().iter().enumerate() {
-            data[begin_in_data + self.0.begin + i] = *b;
-        }
-        for (i, b) in value_to_write.to_be_bytes().iter().enumerate() {
-            data[begin_in_data + self.0.begin + i32::BYTES + i] = *b;
-        }
-    }
-}
-
-pub struct DateAndTimeField<'a>(pub &'a ByteRange);
-impl<'a> DateAndTimeField<'a> {
-    pub fn format_by_bytes(value: &[u8; 7]) -> String {
-        // The first byte has a number of years since 1900
-        let year = 1900 + value[0] as usize;
-        let month = value[1] as usize;
-        let day = value[2] as usize;
-        let hours = value[3] as usize;
-        let minutes = value[4] as usize;
-        let seconds = value[5] as usize;
-        format!(
-            "{}-{:0>2}-{:0>2} {:0>2}:{:0>2}:{:0>2}",
-            year, month, day, hours, minutes, seconds
-        )
-    }
-    pub fn with_range(range: &'a ByteRange) -> Self {
-        Self(&range)
-    }
-    pub fn write_into(&self, data: &mut [u8], begin_in_data: usize, value: &[u8; 7]) {
-        let begin = self.0.begin + begin_in_data;
-        for (i, b) in data[begin..begin + value.len()].iter_mut().enumerate() {
-            *b = value[i];
-        }
-    }
-}
-
-#[test]
-fn write_into_array_as_both_endian_i32() {
-    let mut data = [0_u8; 8];
-
-    let field = BothEndianI32Field::with_range(&ByteRange { begin: 0, end: 1 });
-    field.write_into(&mut data, 0, 16);
-
-    assert_eq!(data, [16, 0, 0, 0, 0, 0, 0, 16]);
-}
-
-pub struct LittleEndianField<'a>(pub &'a ByteRange);
-impl<'a> LittleEndianField<'a> {
-    pub fn with_range(range: &'a ByteRange) -> Self {
-        Self(&range)
-    }
-    pub fn write_into(&self, data: &mut [u8], begin_in_data: usize, value_to_write: i32) {
-        for (i, b) in value_to_write.to_le_bytes().iter().enumerate() {
-            data[begin_in_data + self.0.begin + i] = *b;
-        }
-    }
-}
-
-pub struct StringField<'a>(pub &'a ByteRange);
-impl<'a> StringField<'a> {
-    pub fn with_range(range: &'a ByteRange) -> Self {
-        Self(&range)
-    }
-    pub fn write_into(&self, data: &mut [u8], begin_in_data: usize, value_to_write: &String) {
-        const IDENTIFIER_ZEROFILL_CHARACTER: u8 = 32;
-
-        let len = value_to_write.len();
-
-        // Copy bytes from a value to a target
-        for (i, b) in value_to_write.bytes().enumerate() {
-            data[begin_in_data + self.0.begin + i] = b;
-        }
-
-        // Zerofill all the rest of the range with a zerofill character
-        for i in self.0.begin + len..self.0.end - 1 {
-            data[begin_in_data + i] = IDENTIFIER_ZEROFILL_CHARACTER;
-        }
     }
 }
 
@@ -274,29 +72,23 @@ impl Serialize for DirectoryRecord {
         result[DirectoryRecord::EXTENDED_ATTRIBUTE_RECORD_POSITION] =
             self.extended_attribute_record;
 
-        BothEndianI32Field::with_range(&DirectoryRecord::LOCATION_OF_EXTENT_RANGE).write_into(
+        fields::BothEndianI32::with_range(&DirectoryRecord::LOCATION_OF_EXTENT_RANGE).write_into(
             &mut result,
             0,
             self.location_of_extent,
         );
-        BothEndianI32Field::with_range(&DirectoryRecord::SIZE_OF_EXTENT_RANGE).write_into(
+        fields::BothEndianI32::with_range(&DirectoryRecord::SIZE_OF_EXTENT_RANGE).write_into(
             &mut result,
             0,
             self.data_length,
         );
-        DateAndTimeField::with_range(&DirectoryRecord::RECORDING_DATE_AND_TIME_RANGE).write_into(
-            &mut result,
-            0,
-            &self.recording_date_and_time,
-        );
+        fields::DateAndTime::with_range(&DirectoryRecord::RECORDING_DATE_AND_TIME_RANGE)
+            .write_into(&mut result, 0, &self.recording_date_and_time);
         result[DirectoryRecord::FILE_FLAGS_POSITION] = self.file_flags;
         result[DirectoryRecord::FILE_UNIT_SIZE_POSITION] = self.file_unit_size;
         result[DirectoryRecord::INTERLEAVE_GAP_SIZE_POSITION] = self.interleave_gap_size;
-        BothEndianI16Field::with_range(&DirectoryRecord::VOLUME_SEQUENCE_NUMBER_RANGE).write_into(
-            &mut result,
-            0,
-            self.volume_sequence_number,
-        );
+        fields::BothEndianI16::with_range(&DirectoryRecord::VOLUME_SEQUENCE_NUMBER_RANGE)
+            .write_into(&mut result, 0, self.volume_sequence_number);
         result[DirectoryRecord::FILE_IDENTIFIER_LENGTH_POSITION] = self.file_identifier_length;
 
         result
@@ -398,7 +190,7 @@ impl DirectoryRecord {
             && (self.file_flags & DirectoryRecordFileFlag::MultiExtent == 0)
     }
     pub fn recording_date_and_time_formatted(&self) -> String {
-        DateAndTimeField::format_by_bytes(&self.recording_date_and_time)
+        fields::DateAndTime::format_by_bytes(&self.recording_date_and_time)
     }
 }
 
@@ -832,16 +624,13 @@ impl Sector {
         ];
         write_bytes_into(&mut data, 0, &header);
 
-        StringField::with_range(&PrimaryVolumeDescriptor::VOLUME_IDENTIFIER_RANGE).write_into(
-            &mut data,
-            HEADER_LEN,
-            &descriptor.volume_identifier,
-        );
-        BothEndianI32Field::with_range(&PrimaryVolumeDescriptor::VOLUME_SPACE_SIZE_RANGE)
+        fields::StringField::with_range(&PrimaryVolumeDescriptor::VOLUME_IDENTIFIER_RANGE)
+            .write_into(&mut data, HEADER_LEN, &descriptor.volume_identifier);
+        fields::BothEndianI32::with_range(&PrimaryVolumeDescriptor::VOLUME_SPACE_SIZE_RANGE)
             .write_into(&mut data, HEADER_LEN, descriptor.volume_space_size);
-        BothEndianI16Field::with_range(&PrimaryVolumeDescriptor::LOGICAL_BLOCK_SIZE_RANGE)
+        fields::BothEndianI16::with_range(&PrimaryVolumeDescriptor::LOGICAL_BLOCK_SIZE_RANGE)
             .write_into(&mut data, HEADER_LEN, descriptor.logical_block_size);
-        LittleEndianField(&PrimaryVolumeDescriptor::LOCATION_OF_TYPE_L_PATH_TABLE_RANGE)
+        fields::LittleEndian(&PrimaryVolumeDescriptor::LOCATION_OF_TYPE_L_PATH_TABLE_RANGE)
             .write_into(
                 &mut data,
                 HEADER_LEN,
@@ -852,16 +641,10 @@ impl Sector {
             HEADER_LEN + PrimaryVolumeDescriptor::DIRECTORY_RECORD_FOR_ROOT_DIRECTORY_RANGE.begin,
             &descriptor.directory_record_for_root_directory.serialize(),
         );
-        StringField::with_range(&PrimaryVolumeDescriptor::PUBLISHER_IDENTIFIER_RANGE).write_into(
-            &mut data,
-            HEADER_LEN,
-            &descriptor.publisher_identifier,
-        );
-        StringField::with_range(&PrimaryVolumeDescriptor::APPLICATION_IDENTIFIER_RANGE).write_into(
-            &mut data,
-            HEADER_LEN,
-            &descriptor.application_identifier,
-        );
+        fields::StringField::with_range(&PrimaryVolumeDescriptor::PUBLISHER_IDENTIFIER_RANGE)
+            .write_into(&mut data, HEADER_LEN, &descriptor.publisher_identifier);
+        fields::StringField::with_range(&PrimaryVolumeDescriptor::APPLICATION_IDENTIFIER_RANGE)
+            .write_into(&mut data, HEADER_LEN, &descriptor.application_identifier);
 
         assert_eq!(data, *old_data);
         Ok(Sector { data })
