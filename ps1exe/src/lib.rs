@@ -184,11 +184,17 @@ impl<'a> PS1ExeWriter<'a> {
         let address = self.exe.get_address_by_address_in_memory(address_in_memory);
 
         // Debug printing to ensure the correct address is being written to
-        println!(
+        let code_print = format!(
             "Writing code {:?} to {:?}...",
             code,
             &self.exe.data[address..address + code.len()]
         );
+        if *code == self.exe.data[address..address + code.len()] {
+            println!("{}", code_print);
+        } else {
+            use colored::*;
+            println!("{}", code_print.red());
+        }
 
         // Overwrite bytes in the executable file with given code
         self.exe.data[address..address + code.len()].copy_from_slice(code);

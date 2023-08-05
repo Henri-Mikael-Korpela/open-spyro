@@ -593,6 +593,35 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
         else if line.starts_with("#") {
             continue;
         }
+        // If the line contains an assignment
+        else if line.starts_with("let") {
+            let assignment_parts = line[3..].split("=").collect::<Vec<&str>>();
+
+            if assignment_parts.len() != 2 {
+                return Err(format!(
+                    "Could not parse assignment \"{}\": Invalid assignment format",
+                    line
+                ));
+            }
+
+            let variable_name = assignment_parts[0].trim().to_string();
+            let variable_value = assignment_parts[1].trim();
+
+            // If the variable value is a string
+            if variable_value.starts_with("\"") && variable_value.ends_with("\"") {
+                let variable_value = variable_value[1..variable_value.len() - 1].to_string();
+                nodes.push(Node {
+                    kind: NodeKind::Assignment(variable_name, variable_value),
+                });
+            }
+            // If the variable value is something else
+            else {
+                return Err(format!(
+                    "Could not parse assignment \"{}\": Invalid value format. Only strings marked with double quotes are supported.",
+                    line
+                ));
+            }
+        }
         // If the line contains a label, store a label node.
         else if line.ends_with(":") {
             let label = line[..line.len() - 1].to_string();
@@ -851,6 +880,7 @@ pub struct Node {
 }
 #[derive(Debug, PartialEq)]
 pub enum NodeKind {
+    Assignment(String, String),
     CustomCommand(CustomCommand),
     Instruction(Instruction),
     Label(String),

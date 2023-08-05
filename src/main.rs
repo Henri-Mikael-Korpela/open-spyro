@@ -63,6 +63,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             for node in nodes.iter() {
                 match &node.kind {
+                    NodeKind::Assignment(variable_name, value) => {
+                        current_address += 4;
+                        println!("Assignment to write: {} = {}", variable_name, value);
+                        ps1_exe_writer.write_code(current_address, value.as_bytes());
+                    }
                     NodeKind::CustomCommand(command) => match command {
                         CustomCommand::At(address) => {
                             current_address = *address - 4;
