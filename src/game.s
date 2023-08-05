@@ -249,6 +249,16 @@ let dragon_name_argus   = "ARGUS"
 @at 0x80075554
 let dragon_name_silvus  = "SILVUS"
 
+start:
+    @at 0x8005b8e0
+    lui v0, 32775
+    addiu v0, v0, 22080
+    lui v1, 32776
+    addiu v1, v1, 43576
+    sw zero, 0(v0)
+    addiu v0, v0, 4
+    sltu at, v0, v1
+
 spy_render_text_as_3d_letters_large:
     @at 0x800181ac
     addiu sp, sp, 65488
@@ -267,6 +277,26 @@ spy_render_text_as_3d_for_rescuing_dragon:
     nop
     lw v0, 56(v0)
     nop
+spy_render_menu:
+    @at 0x8001a40c
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu sp, sp, 65200
+    sw ra, 332(sp)
+    sw fp, 328(sp)
+    sw s7, 324(sp)
+    sw s6, 320(sp)
+    sw s5, 316(sp)
+    sw s4, 312(sp)
+    sw s3, 308(sp)
+    sw s2, 304(sp)
+    sw s1, 300(sp)
+
+    @at 0x8001a47c
+    lui s5, 32775
+    addiu s5, s5, 28384
+    lui a0, 32775
+    lw a0, 22664(a0)
 spy_render_text_as_3d_letters_format:
     @at 0x80062fd4
     sw a1, 4(sp)

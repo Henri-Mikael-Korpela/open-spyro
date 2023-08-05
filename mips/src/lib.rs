@@ -174,6 +174,17 @@ impl Instruction {
                     immediate,
                 }
             }
+            // lui, opcode 15
+            0b001111 => {
+                let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let immediate = (machine_code & 0xFFFF) as u16; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                Instruction::IUnsigned {
+                    opcode,
+                    rs: 0,
+                    rt,
+                    immediate,
+                }
+            }
             // lw, opcode 35
             0b100011 => {
                 let rt = ((machine_code >> 16) & 0b11111) as u8;
