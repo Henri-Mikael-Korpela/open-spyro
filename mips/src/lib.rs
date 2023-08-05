@@ -583,14 +583,11 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
     let mut nodes = Vec::new();
 
     for line in content_lines {
-        let line = line.trim();
+        let line = line.split("#").collect::<Vec<&str>>();
+        let line = line[0].trim();
 
         // If the line is empty, skip the line.
         if line.is_empty() {
-            continue;
-        }
-        // If the line contains a comment, skip the line.
-        else if line.starts_with("#") {
             continue;
         }
         // If the line contains an assignment
