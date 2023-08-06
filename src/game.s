@@ -1,8 +1,8 @@
 # Homeworld names
 @at 0x80010000
-let level_title_dragonx       = "DRAGON X"
+let level_title_dragonx       = "DRAGON X"        # Unused in game. May not be a level title, could be a placeholder name for a dragon name.
 @at 0x8001000c
-let level_title_thigh_masters = "THIGH MASTERS"
+let level_title_thigh_masters = "THIGH MASTERS"   # Unused in game
 @at 0x8001001c
 let level_title_gnastys_world = "GNASTY'S WORLD"
 @at 0x8001002c
@@ -35,7 +35,7 @@ let level_name_gnorc_gnexus    = "GNORC GNEXUS"
 @at 0x800100d0
 let level_name_icy_flight     = "ICY FLIGHT"
 #@at 0x80075568
-#let level_name_jacques        = "JACQUES" # Located in different place in memory for some reason
+#let level_name_jacques       = "JACQUES" # Located in different place in memory for some reason
 @at 0x800100dc
 let level_name_haunted_towers = "HAUNTED TOWERS"
 @at 0x800100ec
@@ -83,7 +83,7 @@ let level_name_dry_canyon   = "DRY CANYON"
 @at 0x800101d4
 let level_name_sunny_flight = "SUNNY FLIGHT"
 #@at 0x80075570
-#let level_name_toasty       = "TOASTY" # Located in different place in memory for some reason
+#let level_name_toasty      = "TOASTY" # Located in different place in memory for some reason
 @at 0x800101e4
 let level_name_town_square  = "TOWN SQUARE"
 @at 0x800101f0
@@ -93,161 +93,176 @@ let level_name_stone_hill   = "STONE HILL"
 
 # Dragon names
 @at 0x800752e8
-let dragon_name_revilo  = "REVILO"
+let dragon_name_revilo  = "REVILO"  # In Jacques. Oliver backwards.
 @at 0x800752f0
-let dragon_name_rashidi = "RASHIDI"
+let dragon_name_rashidi = "RASHIDI" # Unused in the final game. Probably was or was intended to be located in Jacques.
 @at 0x800752f8
-let dragon_name_unika   = "UNIKA"
+let dragon_name_unika   = "UNIKA"   # In Jacques.
 @at 0x80075300
-let dragon_name_lutalo  = "LUTALO"
+let dragon_name_lutalo  = "LUTALO"  # In Haunted Towers.
 @at 0x80075308
-let dragon_name_copano  = "COPANO"
+let dragon_name_copano  = "COPANO"  # In Haunted Towers.
 @at 0x80075310
-let dragon_name_kosoko  = "KOSOKO"
+let dragon_name_kosoko  = "KOSOKO"  # In Haunted Towers.
 @at 0x80075318
-let dragon_name_mudada  = "MUDADA"
+let dragon_name_mudada  = "MUDADA"  # In Lofty Castle.
 @at 0x80075320
-let dragon_name_baruti  = "BARUTI"
+let dragon_name_baruti  = "BARUTI"  # In Lofty Castle.
 @at 0x80075328
-let dragon_name_useni   = "USENI"
+let dragon_name_useni   = "USENI"   # In Lofty Castle.
 @at 0x80075330
-let dragon_name_obasi   = "OBASI"
+let dragon_name_obasi   = "OBASI"   # In Dark Passage.
 @at 0x80075338
-let dragon_name_apara   = "APARA"
+let dragon_name_apara   = "APARA"   # In Dark Passage.
 @at 0x80075340
-let dragon_name_bakari  = "BAKARI"
+let dragon_name_bakari  = "BAKARI"  # In Dark Passage.
 @at 0x80075348
-let dragon_name_azizi   = "AZIZI"
+let dragon_name_azizi   = "AZIZI"   # In Dark Passage.
 @at 0x80075350
-let dragon_name_kasiya  = "KASIYA"
+let dragon_name_kasiya  = "KASIYA"  # In Dark Passage.
 @at 0x80075358
-let dragon_name_lateef  = "LATEEF"
+let dragon_name_lateef  = "LATEEF"  # In Dream Weavers homeworld.
 @at 0x80075360
-let dragon_name_mazi    = "MAZI"
+let dragon_name_mazi    = "MAZI"    # In Dream Weavers homeworld.
 @at 0x80075370
-let dragon_name_sadiki  = "SADIKI"
+let dragon_name_sadiki  = "SADIKI"  # In Metalhead.
 @at 0x80075378
-let dragon_name_jed     = "JED"
+let dragon_name_jed     = "JED"     # In Tree Tops.
 @at 0x8007537c
-let dragon_name_lyde    = "LYLE"
+let dragon_name_lyde    = "LYLE"    # In Tree Tops.
 @at 0x80075384
-let dragon_name_isaak   = "ISAAK"
+let dragon_name_isaak   = "ISAAK"   # In Tree Tops.
 @at 0x8007538c
-let dragon_name_zeke    = "ZEKE"
+let dragon_name_zeke    = "ZEKE"    # In Misty Bog.
 @at 0x80075394
-let dragon_name_bubba   = "BUBBA"
+let dragon_name_bubba   = "BUBBA"   # In Misty Bog.
 @at 0x8007539c
-let dragon_name_damon   = "DAMON"
+let dragon_name_damon   = "DAMON"   # In Misty Bog.
 @at 0x800753a4
-let dragon_name_rosco   = "ROSCO"
+let dragon_name_rosco   = "ROSCO"   # In Misty Bog.
 @at 0x800753ac
-let dragon_name_cyprin  = "CYPRIN"
+let dragon_name_cyprin  = "CYPRIN"  # In Terrace Village.
 @at 0x800753b4
-let dragon_name_claude  = "CLAUDE"
+let dragon_name_claude  = "CLAUDE"  # In Terrace Village.
 @at 0x800753bc
-let dragon_name_cleetus = "CLEETUS"
+let dragon_name_cleetus = "CLEETUS" # In Beast Makers homeworld.
 @at 0x800753c4
-let dragon_name_bruno   = "BRUNO"
+let dragon_name_bruno   = "BRUNO"   # In Beast Makers homeworld.
 @at 0x800753cc
-let dragon_name_jethro  = "JETHRO"
+let dragon_name_jethro  = "JETHRO"  # Unused in the final game. Probably was or was intended to be located in one of the Magic Crafters levels.
 @at 0x800753d4
-let dragon_name_finlay  = "FINLAY"
+let dragon_name_finlay  = "FINLAY"  # Unused in the final game. Probably was or was intended to be located in one of the Magic Crafters levels.
 @at 0x800753dc
-let dragon_name_altair  = "ALTAIR"
+let dragon_name_altair  = "ALTAIR"  # In Blowhard.
 @at 0x800753e4
-let dragon_name_lucas   = "LUCAS"
+let dragon_name_lucas   = "LUCAS"   # In Wizard Peak.
 @at 0x800753ec
-let dragon_name_jarvis  = "JARVIS"
+let dragon_name_jarvis  = "JARVIS"  # In Wizard Peak.
 @at 0x800753f4
-let dragon_name_hexus   = "HEXUS"
+let dragon_name_hexus   = "HEXUS"   # In Wizard Peak.
 @at 0x800753fc
-let dragon_name_cedric  = "CEDRIC"
+let dragon_name_cedric  = "CEDRIC"  # In High Caves.
 @at 0x80075404
-let dragon_name_ajax    = "AJAX"
+let dragon_name_ajax    = "AJAX"    # In High Caves.
 @at 0x8007540c
-let dragon_name_cyrus   = "CYRUS"
+let dragon_name_cyrus   = "CYRUS"   # In High Caves.
 @at 0x80075414
-let dragon_name_zander  = "ZANDER"
+let dragon_name_zander  = "ZANDER"  # In Alpine Ridge.
 @at 0x8007541c
-let dragon_name_kelvin  = "KELVIN"
+let dragon_name_kelvin  = "KELVIN"  # In Alpine Ridge.
 @at 0x80075424
-let dragon_name_eldrid  = "ELDRID"
+let dragon_name_eldrid  = "ELDRID"  # In Alpine Ridge.
 @at 0x8007542c
-let dragon_name_zane    = "ZANE"
+let dragon_name_zane    = "ZANE"    # In Alpine Ridge.
 @at 0x80075434
-let dragon_name_boldar  = "BOLDAR"
+let dragon_name_boldar  = "BOLDAR"  # In Magic Crafters homeworld.
 @at 0x8007543c
-let dragon_name_zantor  = "ZANTOR"
+let dragon_name_zantor  = "ZANTOR"  # In Magic Crafters homeworld.
 @at 0x80075444
-let dragon_name_cosmos  = "COSMOS"
+let dragon_name_cosmos  = "COSMOS"  # In Magic Crafters homeworld.
 @at 0x8007544c
-let dragon_name_trondo  = "TRONDO"
+let dragon_name_trondo  = "TRONDO"  # In Doctor Shemp.
 @at 0x80075454
-let dragon_name_asher   = "ASHER"
+let dragon_name_asher   = "ASHER"   # In Ice Cavern.
 @at 0x8007545c
-let dragon_name_todor   = "TODOR"
+let dragon_name_todor   = "TODOR"   # In Ice Cavern.
 @at 0x80075464
-let dragon_name_ulric   = "ULRIC"
+let dragon_name_ulric   = "ULRIC"   # In Ice Cavern.
 @at 0x8007546c
-let dragon_name_ragnar  = "RAGNAR"
+let dragon_name_ragnar  = "RAGNAR"  # In Ice Cavern.
 @at 0x80075474
-let dragon_name_andor   = "ANDOR"
+let dragon_name_andor   = "ANDOR"   # In Ice Cavern.
 @at 0x8007547c
-let dragon_name_gale    = "GALE"
+let dragon_name_gale    = "GALE"    # Unused in the final game. Probably was or was intended to be located in Cliff Town.
 @at 0x80075484
-let dragon_name_halvor  = "HALVOR"
+let dragon_name_halvor  = "HALVOR"  # In Cliff Town.
 @at 0x8007548c
-let dragon_name_enzo    = "ENZO"
+let dragon_name_enzo    = "ENZO"    # In Cliff Town.
 @at 0x80075494
-let dragon_name_marco   = "MARCO"
+let dragon_name_marco   = "MARCO"   # In Cliff Town.
 @at 0x8007549c
-let dragon_name_thor    = "THOR"
+let dragon_name_thor    = "THOR"    # In Town Square.
 @at 0x800754a4
-let dragon_name_ivor    = "IVOR"
+let dragon_name_ivor    = "IVOR"    # In Dry Canyon.
 @at 0x800754ac
-let dragon_name_conan   = "CONAN"
+let dragon_name_conan   = "CONAN"   # In Dry Canyon.
 @at 0x800754b4
-let dragon_name_maximos = "MAXIMOS"
+let dragon_name_maximos = "MAXIMOS" # In Dry Canyon.
 @at 0x800754bc
-let dragon_name_boris   = "BORIS"
+let dragon_name_boris   = "BORIS"   # In Dry Canyon.
 @at 0x800754c4
-let dragon_name_titan   = "TITAN"
+let dragon_name_titan   = "TITAN"   # In Peace Keepers homeworld.
 @at 0x800754cc
-let dragon_name_gunnar  = "GUNNAR"
+let dragon_name_gunnar  = "GUNNAR"  # In Peace Keepers homeworld.
 @at 0x800754d4
-let dragon_name_magnus  = "MAGNUS"
+let dragon_name_magnus  = "MAGNUS"  # In Peace Keepers homeworld.
 @at 0x800754dc
-let dragon_name_nevin   = "NEVIN"
+let dragon_name_nevin   = "NEVIN"   # In Toasty.
 @at 0x800754e4
-let dragon_name_alvar   = "ALVAR"
+let dragon_name_alvar   = "ALVAR"   # In Town Square.
 @at 0x800754ec
-let dragon_name_tomas   = "TOMAS"
+let dragon_name_tomas   = "TOMAS"   # In Artisans homeworld.
 @at 0x800754f4
-let dragon_name_devlin  = "DEVLIN"
+let dragon_name_devlin  = "DEVLIN"  # In Town Square.
 @at 0x800754fc
-let dragon_name_nils    = "NILS"
+let dragon_name_nils    = "NILS"    # In Town Square.
 @at 0x80075504
-let dragon_name_alban   = "ALBAN"
+let dragon_name_alban   = "ALBAN"   # In Dark Hollow.
 @at 0x8007550c
-let dragon_name_darius  = "DARIUS"
+let dragon_name_darius  = "DARIUS"  # In Dark Hollow.
 @at 0x80075514
-let dragon_name_oswin   = "OSWIN"
+let dragon_name_oswin   = "OSWIN"   # In Dark Hollow.
 @at 0x8007551c
-let dragon_name_gavin   = "GAVIN"
+let dragon_name_gavin   = "GAVIN"   # In Stone Hill. Name is probably a reference to Andy Gavin,
+                                    # who worked for Naughty Dog. Naughty Dog had a close
+                                    # relationship with Insomniac Games at the time.
 @at 0x80075524
-let dragon_name_astor   = "ASTOR"
+let dragon_name_astor   = "ASTOR"   # In Stone Hill.
 @at 0x8007552c
-let dragon_name_gildas  = "GILDAS"
+let dragon_name_gildas  = "GILDAS"  # In Stone Hill.
 @at 0x80075534
-let dragon_name_lindar  = "LINDAR"
+let dragon_name_lindar  = "LINDAR"  # In Stone Hill.
 @at 0x8007553c
-let dragon_name_nestor  = "NESTOR"
+let dragon_name_nestor  = "NESTOR"  # In Artisans homeworld.
 @at 0x80075544
-let dragon_name_delbin  = "DELBIN"
+let dragon_name_delbin  = "DELBIN"  # In Artisans homeworld.
 @at 0x8007554c
-let dragon_name_argus   = "ARGUS"
+let dragon_name_argus   = "ARGUS"   # In Artisans homeworld.
 @at 0x80075554
-let dragon_name_silvus  = "SILVUS"
+let dragon_name_silvus  = "SILVUS"  # Unused in the final game. Silvus was used in demo builds of the game.
+
+# Balloonist names
+@at 0x80075580
+let balloonist_name_hak     = "HAK"      # In Gnorc Gnexus
+@at 0x80075584
+let balloonist_name_amos    = "AMOS"     # In Dream Weavers
+@at 0x8007558c
+let balloonist_name_cray    = "CRAY"     # In Beast Makers
+@at 0x80075594
+let balloonist_name_tuco    = "TUCO"     # In Magic Crafters
+@at 0x8007559c
+let balloonist_name_gosnold = "GOSNOLD"  # In Peace Keepers
+# let balloonist_name_marco = "MARCO"    # In Artisans, shares the same name with a dragon
 
 start:
     @at 0x8005b8e0
@@ -291,12 +306,9 @@ spy_render_menu:
     sw s3, 308(sp)
     sw s2, 304(sp)
     sw s1, 300(sp)
-
-    @at 0x8001a47c
-    lui s5, 32775
-    addiu s5, s5, 28384
-    lui a0, 32775
-    lw a0, 22664(a0)
+    bne v0, zero, 104
+    sw s0, 296(sp)
+    jal 84080
 spy_render_text_as_3d_letters_format:
     @at 0x80062fd4
     sw a1, 4(sp)

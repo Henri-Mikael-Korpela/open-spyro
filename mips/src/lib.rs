@@ -112,6 +112,10 @@ pub enum Instruction {
         rt: u8,
         immediate: u16,
     },
+    J {
+        opcode: u8,
+        address: u32,
+    },
     Nop,
     R {
         opcode: u8,
@@ -174,6 +178,24 @@ impl Instruction {
                     immediate,
                 }
             }
+            // bne, opcode 5
+            0b000101 => {
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
+                let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let immediate2 = (machine_code & 0xFFFF) as u32; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                let immediate = immediate2 as u16 as i16;
+                Instruction::ISigned {
+                    opcode,
+                    rs,
+                    rt,
+                    immediate,
+                }
+            }
+            // jal, opcode 3
+            0b000011 => {
+                let address = machine_code & 0x3FFFFFF;
+                Instruction::J { opcode, address }
+            }
             // lui, opcode 15
             0b001111 => {
                 let rt = ((machine_code >> 16) & 0b11111) as u8;
@@ -221,7 +243,7 @@ impl Instruction {
                     immediate,
                 }
             }
-            _ => panic!("Unknown opcode \"{:b}\" ({})", opcode, opcode),
+            _ => panic!("Unknown opcode {:b} (in bin), {} (in dec)", opcode, opcode),
         }
     }
     #[inline]
@@ -244,6 +266,36 @@ impl Instruction {
             "addu" => define_r_instruction_parse!(parts, 0b100001), // Funct is 33
             "and" => define_r_instruction_parse!(parts, 0b100100), // Funct is 36
             "andi" => define_i_signed_instruction_parse!(parts, 0b001100), // Opcode is 12
+            "bne" => match parts[1..] {
+                [rt, rs, address] => {
+                    Ok(Instruction::IExceptional {
+                        opcode: 0b000101, // Opcode is 5
+                        value: parse_register(rs).unwrap_or_else(|e| panic!("{}", e)),
+                        rt: parse_register(rt).unwrap_or_else(|e| panic!("{}", e)),
+                        immediate: parse_immediate_signed(address)
+                            .unwrap_or_else(|e| panic!("{}", e)),
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
+            "j" => match parts[1..] {
+                [address] => {
+                    Ok(Instruction::J {
+                        opcode: 0b000010, // Opcode is 2
+                        address: parse_address(address).unwrap_or_else(|e| panic!("{}", e)),
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
+            "jal" => match parts[1..] {
+                [address] => {
+                    Ok(Instruction::J {
+                        opcode: 0b000011, // Opcode is 3
+                        address: parse_address(address).unwrap_or_else(|e| panic!("{}", e)),
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             "lui" => match parts[1..] {
                 [rt, immediate] => {
                     let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
@@ -379,6 +431,7 @@ impl Instruction {
                 value,
                 immediate,
             } => match opcode {
+                0b000101 => format!("bne ${}, ${}, {}", rt, value, immediate),
                 0b101000 => format!("sb ${}, {}(${})", rt, value, immediate),
                 _ => panic!("Unknown opcode \"{}\" for IExceptional instruction", opcode),
             },
@@ -416,6 +469,11 @@ impl Instruction {
                     _ => panic!("Unknown opcode \"{}\" for I instruction", opcode),
                 }
             }
+            Instruction::J { opcode, address } => match opcode {
+                0b000010 => format!("j {}", address),
+                0b000011 => format!("jal {}", address),
+                _ => panic!("Unknown opcode \"{}\" for J instruction", opcode),
+            },
             Instruction::Nop => String::from("nop"),
             Instruction::R {
                 rs, rt, rd, funct, ..
@@ -491,6 +549,12 @@ impl Instruction {
                 machine_code |= *immediate as u32;
                 machine_code
             }
+            Instruction::J { opcode, address } => {
+                let mut machine_code = 0u32;
+                machine_code |= (*opcode as u32) << 26;
+                machine_code |= *address as u32;
+                machine_code
+            }
             Instruction::Nop => 0u32,
             Instruction::R {
                 opcode,
@@ -535,6 +599,21 @@ fn parse_immediate_signed(content: &str) -> Result<i16, String> {
     }
 }
 
+fn parse_address(content: &str) -> Result<u32, String> {
+    if content.starts_with("0x") || content.starts_with("0X") {
+        u32::from_str_radix(&content[2..], 16)
+            .map_err(|e| format!("Could not parse address \"{}\": {}", content, e.to_string()))
+    } else if content.starts_with("-") {
+        Err(format!(
+            "Could not parse address \"{}\": {}",
+            content, "Negative number given when only unsigned immediate is expected"
+        ))
+    } else {
+        content
+            .parse::<u32>()
+            .map_err(|e| format!("Could not parse address \"{}\": {}", content, e.to_string()))
+    }
+}
 /// Parses an immediate value from a string.
 /// The string must be in the format "0x<hexadecimal number>" or "<decimal number>".
 /// If the string is not in the correct format, an error is returned.
@@ -857,6 +936,33 @@ mod tests {
         // addiu t0, t1, -0x20
         let instruction = Instruction::parse_from_str("addiu t0, t1, -0x20");
         assert!(instruction.is_err());
+    }
+
+    #[test]
+    fn disassemble_jal_instruction_from_bytes() {
+        // jal 0x14870
+        let result_bin = 0b1100000000010100100001110000;
+        let result_hex = 0xc014870;
+        assert_eq!(result_bin, result_hex);
+
+        let instruction = Instruction::parse_from_le_bytes(&[0x70, 0x48, 0x01, 0x0c]);
+        assert_eq!(instruction.to_machine_code(), result_bin);
+        assert_eq!(instruction.to_instruction(), "jal 84080"); // 84080 = 0x14870
+    }
+    #[test]
+    fn disassemble_jal_instruction_from_machine_code() {
+        // jal 0x32
+        let instruction = Instruction::parse_from_machine_code(0x0C000032);
+        assert_eq!(instruction.to_instruction(), "jal 50"); // 50 = 0x32
+    }
+    #[test]
+    fn parse_jal_instruction_from_string() {
+        // jal 0x32
+        let instruction = Instruction::parse_from_str("jal 0x32").unwrap();
+        let result_bin = 0b00001100000000000000000000110010;
+        let result_hex = 0x0C000032;
+        assert_eq!(result_bin, result_hex);
+        assert_eq!(instruction.to_machine_code(), result_bin);
     }
 
     #[test]
