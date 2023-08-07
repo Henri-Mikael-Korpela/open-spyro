@@ -189,7 +189,7 @@ impl<'a> PS1ExeWriter<'a> {
             PS1ExeWriteResult::Unchanged
         } else {
             PS1ExeWriteResult::Changed {
-                code: bytes_to_write_into.to_vec(),
+                original_code: bytes_to_write_into.to_vec(),
             }
         };
 
@@ -218,6 +218,6 @@ impl<'a> PS1ExeWriter<'a> {
 }
 
 pub enum PS1ExeWriteResult {
-    Changed { code: Vec<u8> },
+    Changed { original_code: Vec<u8> },
     Unchanged,
 }

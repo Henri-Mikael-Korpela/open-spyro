@@ -282,6 +282,16 @@ main:
     lw v0, 1276(gp)
     sb s2, 1540(gp)
     sw v0, 1128(gp)
+    slti v0, v0, 2
+    beq v0, zero, 2
+    nop
+    sw s1, 1128(gp)
+    lw v0, 1128(gp)
+    nop
+    slti v0, v0, 5
+    bne v0, zero, 2
+    nop
+    sw s0, 1128(gp)
 @at 0x8005b8e0
 start:
     lui v0, 32775

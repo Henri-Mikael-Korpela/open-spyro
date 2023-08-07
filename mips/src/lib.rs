@@ -178,16 +178,31 @@ impl Instruction {
                     immediate,
                 }
             }
-            // bne, opcode 5
-            0b000101 => {
-                let rs = ((machine_code >> 21) & 0b11111) as u8;
+            // beq, opcode 4
+            0b000100 => {
+                // Parse as an exceptional I instruction
                 let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
                 let immediate2 = (machine_code & 0xFFFF) as u32; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
                 let immediate = immediate2 as u16 as i16;
-                Instruction::ISigned {
+                Instruction::IExceptional {
                     opcode,
-                    rs,
                     rt,
+                    value: rs,
+                    immediate,
+                }
+            }
+            // bne, opcode 5
+            0b000101 => {
+                // Parse as an exceptional I instruction
+                let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
+                let immediate2 = (machine_code & 0xFFFF) as u32; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                let immediate = immediate2 as u16 as i16;
+                Instruction::IExceptional {
+                    opcode,
+                    rt,
+                    value: rs,
                     immediate,
                 }
             }
@@ -231,15 +246,16 @@ impl Instruction {
                     immediate,
                 }
             }
-            // slti, opcode 40
-            0b00101000 => {
-                let value = ((machine_code >> 21) & 0b11111) as u8;
+            // slti, opcode 10
+            0b001010 => {
                 let rt = ((machine_code >> 16) & 0b11111) as u8;
-                let immediate = (machine_code & 0xFFFF) as i16; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
-                Instruction::IExceptional {
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
+                let immediate2 = (machine_code & 0xFFFF) as u32; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                let immediate = immediate2 as u16 as i16;
+                Instruction::ISigned {
                     opcode,
+                    rs,
                     rt,
-                    value,
                     immediate,
                 }
             }
@@ -278,6 +294,18 @@ impl Instruction {
             "addu" => define_r_instruction_parse!(parts, 0b100001), // Funct is 33
             "and" => define_r_instruction_parse!(parts, 0b100100), // Funct is 36
             "andi" => define_i_signed_instruction_parse!(parts, 0b001100), // Opcode is 12
+            "beq" => match parts[1..] {
+                [rt, rs, address] => {
+                    Ok(Instruction::IExceptional {
+                        opcode: 0b000100, // Opcode is 4
+                        value: parse_register(rs).unwrap_or_else(|e| panic!("{}", e)),
+                        rt: parse_register(rt).unwrap_or_else(|e| panic!("{}", e)),
+                        immediate: parse_immediate_signed(address)
+                            .unwrap_or_else(|e| panic!("{}", e)),
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             "bne" => match parts[1..] {
                 [rt, rs, address] => {
                     Ok(Instruction::IExceptional {
@@ -475,10 +503,16 @@ impl Instruction {
                 rt,
                 value,
                 immediate,
-            } => match opcode {
-                0b000101 => format!("bne ${}, ${}, {}", rt, value, immediate), // Opcode is 5
-                _ => panic!("Unknown opcode \"{}\" for IExceptional instruction", opcode),
-            },
+            } => {
+                let rt = REGISTERS[*rt as usize];
+                let value = REGISTERS[*value as usize];
+
+                match opcode {
+                    0b000100 => format!("beq {}, {}, {}", value, rt, immediate), // Opcode is 4
+                    0b000101 => format!("bne {}, {}, {}", value, rt, immediate), // Opcode is 5
+                    _ => panic!("Unknown opcode \"{}\" for IExceptional instruction", opcode),
+                }
+            }
             Instruction::ISigned {
                 opcode,
                 rs,
@@ -984,6 +1018,30 @@ mod tests {
     }
 
     #[test]
+    fn disassemble_beq_instruction_from_bytes() {
+        // beq v0, zero 0x02
+        let instruction = Instruction::parse_from_le_bytes(&[0x02, 0x00, 0x40, 0x10]);
+        assert_eq!(instruction.to_instruction(), "beq v0, zero, 2");
+    }
+
+    #[test]
+    fn parse_bne_instruction_from_string() {
+        // bne t0, t1, 0x20
+        let instruction = Instruction::parse_from_str("bne t0, t1, 0x20").unwrap();
+        let result_bin = 0b00010101000010010000000000100000;
+        let result_hex = 0x15090020;
+        assert_eq!(result_bin, result_hex);
+        assert_eq!(instruction.to_machine_code(), result_bin);
+
+        // bne v0, zero, 0x4
+        let instruction = Instruction::parse_from_str("bne v0, zero, 0x4").unwrap();
+        let result_bin = 0b00010100010000000000000000000100;
+        let result_hex = 0x14400004;
+        assert_eq!(result_bin, result_hex);
+        assert_eq!(instruction.to_machine_code(), result_bin);
+    }
+
+    #[test]
     fn disassemble_jal_instruction_from_bytes() {
         // jal 0x14870
         let result_bin = 0b1100000000010100100001110000;
@@ -1011,18 +1069,38 @@ mod tests {
     }
 
     #[test]
-    fn parse_lui_instruction_from_machine_code() {
-        // lui t0, 0x20
-        let instruction = Instruction::parse_from_machine_code(0x3C080020);
-        let result_bin = 0b00111100000100000000000000100000;
-        let result_hex = 0x3C080020;
+    fn disassemble_slti_instruction_from_bytes() {
+        // slti t0, t1, 0x20
+        let result_bin = 0b00101001001010000000000000100000;
+        let result_hex = 0x29280020;
+        assert_eq!(result_bin, result_hex);
+
+        let instruction = Instruction::parse_from_le_bytes(&[0x20, 0x00, 0x28, 0x29]);
+        assert_eq!(instruction.to_machine_code(), result_bin);
+        assert_eq!(instruction.to_instruction(), "slti t0, t1, 32"); // 32 = 0x20
+
+        // slti v0, v0, 0x5
+        let result_bin = 0b00101000010000100000000000000101;
+        let result_hex = 0x28420005;
+        assert_eq!(result_bin, result_hex);
+
+        let instruction = Instruction::parse_from_le_bytes(&[0x05, 0x00, 0x42, 0x28]);
+        assert_eq!(instruction.to_machine_code(), result_bin);
+        assert_eq!(instruction.to_instruction(), "slti v0, v0, 5"); // 5 = 0x5
+    }
+    #[test]
+    fn parse_slti_instruction_from_machine_code() {
+        // slti t0, t1, 0x20
+        let instruction = Instruction::parse_from_machine_code(0x29280020);
+        let result_bin = 0b00101001001010000000000000100000;
+        let result_hex = 0x29280020;
         assert_eq!(result_bin, result_hex);
         assert_eq!(instruction.to_machine_code(), result_bin);
 
-        // lui v0, 0x8007
-        let instruction = Instruction::parse_from_machine_code(0x3C028007);
-        let result_bin = 0b00111100000000101000000000000111;
-        let result_hex = 0x3C028007;
+        // slti v0, v0, 0x5
+        let instruction = Instruction::parse_from_machine_code(0x28420005);
+        let result_bin = 0b00101000010000100000000000000101;
+        let result_hex = 0x28420005;
         assert_eq!(result_bin, result_hex);
         assert_eq!(instruction.to_machine_code(), result_bin);
     }

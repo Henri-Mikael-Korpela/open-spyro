@@ -19,11 +19,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match (command.as_str(), &args[2..]) {
         // Assemble MIPS assembly code from a given text file into a Playstation executable
-        ("ps1exe-assemble", [input_file_path, output_ps1_exe_file_path]) => {
-            let mut input_file = File::open(input_file_path).map_err(|_| {
+        (
+            "ps1exe-assemble",
+            [input_assembly_code_file_path, input_ps1_exe_file_path, output_ps1_exe_file_path],
+        ) => {
+            let mut input_file = File::open(input_assembly_code_file_path).map_err(|_| {
                 format!(
                     "Failed to open given input MIPS assembly code file in path \"{}\".",
-                    input_file_path
+                    input_assembly_code_file_path
                 )
             })?;
 
@@ -33,19 +36,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .map_err(|_| {
                     format!(
                         "Failed to read given input MIPS assembly code file in path \"{}\".",
-                        input_file_path
+                        input_assembly_code_file_path
                     )
                 })?;
 
             let nodes = parse_nodes(&input_file_content).map_err(|e| {
                 format!(
                     "Failed to parse given input MIPS assembly code file in path \"{}\": {}",
-                    input_file_path,
+                    input_assembly_code_file_path,
                     e.to_string()
                 )
             })?;
 
-            let mut ps1_exe = PS1Exe::from_file_path(output_ps1_exe_file_path)?;
+            println!("Input PS1 EXE file path: {}", input_ps1_exe_file_path);
+            let mut ps1_exe = PS1Exe::from_file_path(input_ps1_exe_file_path)?;
 
             // Print Playstation executable header information
             println!(
@@ -68,17 +72,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     NodeKind::Assignment(variable_name, value) => {
                         current_address += 4;
 
-                        if let PS1ExeWriteResult::Changed { code } =
+                        if let PS1ExeWriteResult::Changed { original_code } =
                             ps1_exe_writer.write_code(current_address, value.as_bytes())
                         {
                             println!(
                                 "{}",
                                 format!(
-                                    "Assignment {} = {} - changed bytes from {:?} to {:?}",
+                                    "Assignment {} = {} - changed bytes to {:?} from {:?}",
                                     variable_name,
                                     value,
                                     value.as_bytes(),
-                                    code
+                                    original_code
                                 )
                                 .red()
                             );
@@ -92,16 +96,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     NodeKind::Instruction(instruction) => {
                         current_address += 4;
 
-                        if let PS1ExeWriteResult::Changed { code } =
+                        if let PS1ExeWriteResult::Changed { original_code } =
                             ps1_exe_writer.write_code(current_address, &instruction.to_le_bytes())
                         {
                             println!(
                                 "{}",
                                 format!(
-                                    "{} - changed bytes from {:?} to {:?}",
+                                    "{} - changed bytes to {:?} from {:?}",
                                     instruction.to_instruction(),
                                     instruction.to_le_bytes(),
-                                    code
+                                    original_code
                                 )
                                 .red()
                             );
@@ -111,8 +115,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
 
-            ps1_exe_writer.write_into_file("/home/henri/hobbies/open-spyro/tmp/SCUS_942.28_mod")?;
+            ps1_exe_writer.write_into_file(output_ps1_exe_file_path)?;
 
+            println!(
+                "Output PS1 EXE file written to \"{}\".",
+                output_ps1_exe_file_path
+            );
             println!("Done!");
             Ok(())
         }
