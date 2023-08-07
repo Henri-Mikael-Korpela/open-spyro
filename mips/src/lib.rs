@@ -625,15 +625,15 @@ impl Instruction {
                 let rt = REGISTERS[*rt as usize];
 
                 match funct {
-                    0b100000 => format!("add {}, {}, {}", rd, rs, rt),
-                    0b100001 => format!("addu {}, {}, {}", rd, rs, rt),
-                    0b100100 => format!("and {}, {}, {}", rd, rs, rt),
-                    0b100111 => format!("nor {}, {}, {}", rd, rs, rt),
-                    0b100101 => format!("or {}, {}, {}", rd, rs, rt),
-                    0b101010 => format!("slt {}, {}, {}", rd, rs, rt),
-                    0b101011 => format!("sltu {}, {}, {}", rd, rs, rt),
-                    0b100010 => format!("sub {}, {}, {}", rd, rs, rt),
-                    0b100011 => format!("subu {}, {}, {}", rd, rs, rt),
+                    0b100000 => format!("add {}, {}, {}", rd, rs, rt), // Funct is 32
+                    0b100001 => format!("addu {}, {}, {}", rd, rs, rt), // Funct is 33
+                    0b100100 => format!("and {}, {}, {}", rd, rs, rt), // Funct is 36
+                    0b100111 => format!("nor {}, {}, {}", rd, rs, rt), // Funct is 39
+                    0b100101 => format!("or {}, {}, {}", rd, rs, rt),  // Funct is 37
+                    0b101010 => format!("slt {}, {}, {}", rd, rs, rt), // Funct is 42
+                    0b101011 => format!("sltu {}, {}, {}", rd, rs, rt), // Funct is 43
+                    0b100010 => format!("sub {}, {}, {}", rd, rs, rt), // Funct is 34
+                    0b100011 => format!("subu {}, {}, {}", rd, rs, rt), // Funct is 35
                     _ => panic!(
                         "Unknown funct \"{:b}\" ({}) for instruction {:?}",
                         funct, funct, self
