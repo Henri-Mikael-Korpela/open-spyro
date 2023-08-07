@@ -957,6 +957,8 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
     let content_lines = content.split("\n");
     let mut nodes = Vec::new();
 
+    const CONST_KEYWORD: &'static str = "const";
+
     for line in content_lines {
         let line = line.split("#").collect::<Vec<&str>>();
         let line = line[0].trim();
@@ -966,8 +968,10 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
             continue;
         }
         // If the line contains an assignment
-        else if line.starts_with("let") {
-            let assignment_parts = line[3..].split("=").collect::<Vec<&str>>();
+        else if line.starts_with(CONST_KEYWORD) {
+            let assignment_parts = line[CONST_KEYWORD.len()..]
+                .split("=")
+                .collect::<Vec<&str>>();
 
             if assignment_parts.len() != 2 {
                 return Err(format!(
