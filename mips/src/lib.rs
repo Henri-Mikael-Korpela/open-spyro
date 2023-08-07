@@ -178,6 +178,18 @@ impl Instruction {
                     immediate,
                 }
             }
+            // andi, opcode 12
+            0b001100 => {
+                let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
+                let immediate = (machine_code & 0xFFFF) as i16; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                Instruction::ISigned {
+                    opcode,
+                    rs,
+                    rt,
+                    immediate,
+                }
+            }
             // beq, opcode 4
             0b000100 => {
                 // Parse as an exceptional I instruction
@@ -222,6 +234,18 @@ impl Instruction {
                 let rs = ((machine_code >> 21) & 0b11111) as u8;
                 let immediate = (machine_code & 0xFFFF) as i16; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
                 Instruction::ISigned {
+                    opcode,
+                    rs,
+                    rt,
+                    immediate,
+                }
+            }
+            // lbu, opcode 36
+            0b100100 => {
+                let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
+                let immediate = (machine_code & 0xFFFF) as u16; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                Instruction::IUnsigned {
                     opcode,
                     rs,
                     rt,
@@ -276,6 +300,19 @@ impl Instruction {
                     immediate,
                 }
             }
+            // sltiu, opcode 11
+            0b001011 => {
+                let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
+                let immediate2 = (machine_code & 0xFFFF) as u32; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                let immediate = immediate2 as u16;
+                Instruction::IUnsigned {
+                    opcode,
+                    rs,
+                    rt,
+                    immediate,
+                }
+            }
             // sw, opcode 43
             0b00101011 => {
                 let rt = ((machine_code >> 16) & 0b11111) as u8;
@@ -288,7 +325,10 @@ impl Instruction {
                     immediate,
                 }
             }
-            _ => panic!("Unknown opcode {:b} (in bin), {} (in dec)", opcode, opcode),
+            _ => panic!(
+                "Unknown opcode {} ({:b} in bin) in parsing from BE bytes",
+                opcode, opcode
+            ),
         }
     }
     #[inline]
@@ -391,6 +431,51 @@ impl Instruction {
 
                     Ok(Instruction::ISigned {
                         opcode: 0b100000, // Opcode is 32
+                        rs,
+                        rt,
+                        immediate,
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
+            "lbu" => match parts[1..] {
+                [rt, immediate, rs] => {
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let immediate =
+                        parse_immediate_unsigned(immediate).unwrap_or_else(|e| panic!("{}", e));
+                    Ok(Instruction::IUnsigned {
+                        opcode: 0b100100, // Opcode is 36
+                        rs,
+                        rt,
+                        immediate,
+                    })
+                }
+                [rt, relative_value] => {
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+
+                    let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
+
+                    let immediate = relative_value_parts.get(0).unwrap_or_else(|| {
+                        panic!(
+                            "Missing immediate in relative value parts {:?}",
+                            relative_value_parts
+                        )
+                    });
+                    let immediate =
+                        parse_immediate_unsigned(immediate).unwrap_or_else(|e| panic!("{}", e));
+
+                    let rs = relative_value_parts.get(1).unwrap_or_else(|| {
+                        panic!(
+                            "Missing rs in relative value parts {:?}",
+                            relative_value_parts
+                        )
+                    });
+                    let rs = rs.replace(")", "");
+                    let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+
+                    Ok(Instruction::IUnsigned {
+                        opcode: 0b100100, // Opcode is 36
                         rs,
                         rt,
                         immediate,
@@ -505,9 +590,44 @@ impl Instruction {
                 }
                 _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
             },
+            "sll" => match parts[1..] {
+                [rd, rt, shamt] => {
+                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let shamt =
+                        parse_immediate_unsigned(shamt).unwrap_or_else(|e| panic!("{}", e)) as u8;
+                    Ok(Instruction::R {
+                        opcode: 0b000000, // Opcode is 0
+                        rs: 0,
+                        rt,
+                        rd,
+                        shamt,
+                        funct: 0b000000, // Funct is 0
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             "slt" => define_r_instruction_parse!(parts, 0b101010), // Funct is 42
             "slti" => define_i_signed_instruction_parse!(parts, 0b001010), // Opcode is 10
+            "sltiu" => define_i_unsigned_instruction_parse!(parts, 0b001011), // Opcode is 11
             "sltu" => define_r_instruction_parse!(parts, 0b101011), // Funct is 43
+            "srl" => match parts[1..] {
+                [rd, rt, shamt] => {
+                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let shamt =
+                        parse_immediate_unsigned(shamt).unwrap_or_else(|e| panic!("{}", e)) as u8;
+                    Ok(Instruction::R {
+                        opcode: 0b000000, // Opcode is 0
+                        rs: 0,
+                        rt,
+                        rd,
+                        shamt,
+                        funct: 0b000010, // Funct is 2
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             "sub" => define_r_instruction_parse!(parts, 0b100010), // Funct is 34
             "subu" => define_r_instruction_parse!(parts, 0b100011), // Funct is 35
             "sw" => match parts[1..] {
@@ -593,7 +713,10 @@ impl Instruction {
                     0b101000 => format!("sb {}, {}({})", rt, immediate, rs),   // Opcode is 40
                     0b001010 => format!("slti {}, {}, {}", rt, rs, immediate), // Opcode is 10
                     0b101011 => format!("sw {}, {}({})", rt, immediate, rs),   // Opcode is 43
-                    _ => panic!("Unknown opcode \"{}\" for I instruction", opcode),
+                    _ => panic!(
+                        "Unknown opcode \"{}\" ({:b} in bin) for I instruction",
+                        opcode, opcode
+                    ),
                 }
             }
             Instruction::IUnsigned {
@@ -607,8 +730,13 @@ impl Instruction {
 
                 match opcode {
                     0b001001 => format!("addiu {}, {}, {}", rt, rs, immediate),
+                    0b100100 => format!("lbu {}, {}({})", rt, immediate, rs),
                     0b001111 => format!("lui {}, {}", rt, immediate),
-                    _ => panic!("Unknown opcode \"{}\" for I instruction", opcode),
+                    0b001011 => format!("sltiu {}, {}, {}", rt, rs, immediate),
+                    _ => panic!(
+                        "Unknown opcode \"{}\" ({:b} in bin) for I instruction",
+                        opcode, opcode
+                    ),
                 }
             }
             Instruction::J { opcode, address } => match opcode {
@@ -618,7 +746,12 @@ impl Instruction {
             },
             Instruction::Nop => String::from("nop"),
             Instruction::R {
-                rs, rt, rd, funct, ..
+                rs,
+                rt,
+                rd,
+                funct,
+                shamt,
+                ..
             } => {
                 let rd = REGISTERS[*rd as usize];
                 let rs = REGISTERS[*rs as usize];
@@ -630,10 +763,20 @@ impl Instruction {
                     0b100100 => format!("and {}, {}, {}", rd, rs, rt), // Funct is 36
                     0b100111 => format!("nor {}, {}, {}", rd, rs, rt), // Funct is 39
                     0b100101 => format!("or {}, {}, {}", rd, rs, rt),  // Funct is 37
-                    0b101010 => format!("slt {}, {}, {}", rd, rs, rt), // Funct is 42
+                    0b000010 => format!("srl {}, {}, {}", rd, rt, shamt), // Funct is 2
                     0b101011 => format!("sltu {}, {}, {}", rd, rs, rt), // Funct is 43
                     0b100010 => format!("sub {}, {}, {}", rd, rs, rt), // Funct is 34
                     0b100011 => format!("subu {}, {}, {}", rd, rs, rt), // Funct is 35
+                    0b000000 => {
+                        match shamt {
+                            0b00011 => format!("sll {}, {}, {}", rd, rt, shamt), // Shampt is 3
+                            0b00010 => format!("srl {}, {}, {}", rd, rt, shamt), // Shampt is 2
+                            _ => panic!(
+                                "Unknown shamt \"{:b}\" ({}) for instruction {:?}",
+                                shamt, shamt, self
+                            ),
+                        }
+                    }
                     _ => panic!(
                         "Unknown funct \"{:b}\" ({}) for instruction {:?}",
                         funct, funct, self

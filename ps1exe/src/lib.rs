@@ -174,14 +174,47 @@ impl<'a> PS1ExeReader<'a> {
 }
 
 pub struct PS1ExeWriter<'a> {
+    /// Stores information about how much of the executable
+    /// bytes has been written into via this writer.
+    data_written: Vec<u8>,
     exe: &'a mut PS1Exe,
 }
 impl<'a> PS1ExeWriter<'a> {
+    pub fn get_percentage_of_written_bytes(&self) -> f32 {
+        let mut written_bytes_count = 0;
+        for i in 0..self.data_written.len() {
+            if self.data_written[i] != 0 {
+                written_bytes_count += 1;
+            }
+        }
+        written_bytes_count as f32 / self.data_written.len() as f32
+    }
     pub fn new(exe: &'a mut PS1Exe) -> Self {
-        Self { exe }
+        Self {
+            data_written: Vec::new(),
+            exe,
+        }
     }
     pub fn write_code(&mut self, address_in_memory: u64, code: &[u8]) -> PS1ExeWriteResult {
+        // By default, data_written vector has nothing in it, it is uninitialized.
+        // So, initialize data_written vector if it hasn't been initialized yet.
+        if self.data_written.len() == 0 {
+            let mut data_len = self.exe.data.len();
+            self.data_written = Vec::with_capacity(data_len);
+            while data_len > 0 {
+                self.data_written.push(0); // 0 means that the byte hasn't been written into yet.
+                data_len -= 1;
+            }
+        }
+
         let address = self.exe.get_address_by_address_in_memory(address_in_memory);
+
+        // Mark bytes as written into based on the given address and code length
+        for i in address..address + code.len() {
+            if self.data_written[i] == 0 {
+                self.data_written[i] = 1;
+            }
+        }
 
         let bytes_to_write_into = &mut self.exe.data[address..address + code.len()];
 

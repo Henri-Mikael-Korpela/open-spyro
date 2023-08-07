@@ -309,7 +309,82 @@ start:
     sw zero, 0(v0)
     addiu v0, v0, 4
     sltu at, v0, v1
+    bne at, zero, -4
+    nop
+    lui v0, 32775
+    lw v0, 21928(v0)
+    nop
+    addi v0, v0, -8
+    lui t0, 32768
+    or sp, v0, t0
+    lui a0, 32776
+    addiu a0, a0, 43576
+    sll a0, a0, 3
+    srl a0, a0, 3
+    lui v1, 32775
+    lw v1, 21924(v1)
+    nop
+    subu a1, v0, v1
+    subu a1, a1, a0
+    lui at, 32775
+    sw a1, 12484(at)
+    or a0, a0, t0
+    lui at, 32775
+    sw a0, 12480(at)
+    lui at, 32775
+    sw ra, 22080(at)
+    lui gp, 32775
+    addiu gp, gp, 21092
+    addu fp, sp, zero
+    jal 95941
+    addi a0, a0, 4
+    lui ra, 32775
+    lw ra, 22080(ra)
+    nop
+    jal 18561
+    nop
 
+@at 0x80017fe4
+spy_render_text_as_3d_letters_normal:
+    addiu sp, sp, 65496
+    sw s0, 16(sp)
+    addu s0, a0, zero
+    sw s1, 20(sp)
+    addu s1, a1, zero
+    sw s2, 24(sp)
+    addu s2, a2, zero
+    sw ra, 32(sp)
+    sw s3, 28(sp)
+    lbu v1, 0(s0)
+    nop
+    beq v1, zero, 92
+    addu s3, a3, zero
+    andi v1, v1, 255
+    addiu v0, zero, 32
+    beq v1, v0, 80
+    addu a1, zero, zero
+    lui a0, 32775
+    lw a0, 22288(a0)
+    nop
+    addiu a0, a0, 65448
+    lui at, 32775
+    sw a0, 22288(at)
+    jal 23109
+    addiu a2, zero, 88
+    lui a0, 32775
+    lw a0, 22288(a0)
+    addu a1, s1, zero
+    jal 24000
+    addiu a0, a0, 12
+    lbu a0, 0(s0)
+    nop
+    addiu v0, a0, 65488
+    sltiu v0, v0, 10
+    beq v0, zero, 5
+    addiu v0, a0, 212
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24653
 @at 0x800181ac
 spy_render_text_as_3d_letters_large:
     addiu sp, sp, 65488

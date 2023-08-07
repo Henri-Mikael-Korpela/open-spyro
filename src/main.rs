@@ -132,6 +132,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ps1_exe_writer.write_into_file(output_ps1_exe_file_path)?;
 
             println!(
+                "Bytes written into binary: {:.2}%",
+                ps1_exe_writer.get_percentage_of_written_bytes() * 100f32
+            );
+            println!(
                 "Output PS1 EXE file written to \"{}\".",
                 output_ps1_exe_file_path
             );
