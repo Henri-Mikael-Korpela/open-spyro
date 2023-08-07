@@ -216,6 +216,18 @@ impl Instruction {
                 let address = machine_code & 0x3FFFFFF;
                 Instruction::J { opcode, address }
             }
+            // lb, opcode 32
+            0b100000 => {
+                let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
+                let immediate = (machine_code & 0xFFFF) as i16; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                Instruction::ISigned {
+                    opcode,
+                    rs,
+                    rt,
+                    immediate,
+                }
+            }
             // lui, opcode 15
             0b001111 => {
                 let rt = ((machine_code >> 16) & 0b11111) as u8;
@@ -337,6 +349,51 @@ impl Instruction {
                     Ok(Instruction::J {
                         opcode: 0b000011, // Opcode is 3
                         address: parse_address(address).unwrap_or_else(|e| panic!("{}", e)),
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
+            "lb" => match parts[1..] {
+                [rt, immediate, rs] => {
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let immediate =
+                        parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
+                    Ok(Instruction::ISigned {
+                        opcode: 0b100000, // Opcode is 32
+                        rs,
+                        rt,
+                        immediate,
+                    })
+                }
+                [rt, relative_value] => {
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+
+                    let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
+
+                    let immediate = relative_value_parts.get(0).unwrap_or_else(|| {
+                        panic!(
+                            "Missing immediate in relative value parts {:?}",
+                            relative_value_parts
+                        )
+                    });
+                    let immediate =
+                        parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
+
+                    let rs = relative_value_parts.get(1).unwrap_or_else(|| {
+                        panic!(
+                            "Missing rs in relative value parts {:?}",
+                            relative_value_parts
+                        )
+                    });
+                    let rs = rs.replace(")", "");
+                    let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+
+                    Ok(Instruction::ISigned {
+                        opcode: 0b100000, // Opcode is 32
+                        rs,
+                        rt,
+                        immediate,
                     })
                 }
                 _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
@@ -530,6 +587,7 @@ impl Instruction {
                 match opcode {
                     0b001000 => format!("addi {}, {}, {}", rt, rs, immediate), // Opcode is 8
                     0b001100 => format!("andi {}, {}, {}", rt, rs, immediate), // Opcode is 12
+                    0b100000 => format!("lb {}, {}({})", rt, immediate, rs),   // Opcode is 32
                     0b001111 => format!("lui {}, {}", rt, immediate),          // Opcode is 15
                     0b100011 => format!("lw {}, {}({})", rt, immediate, rs),   // Opcode is 35
                     0b101000 => format!("sb {}, {}({})", rt, immediate, rs),   // Opcode is 40
@@ -1069,6 +1127,27 @@ mod tests {
         let instruction = Instruction::parse_from_str("jal 0x32").unwrap();
         let result_bin = 0b00001100000000000000000000110010;
         let result_hex = 0x0C000032;
+        assert_eq!(result_bin, result_hex);
+        assert_eq!(instruction.to_machine_code(), result_bin);
+    }
+
+    #[test]
+    fn disassemble_lb_instruction_from_bytes() {
+        // lb t0, 0x20(t1)
+        let result_bin = 0b10000001001010000000000000100000;
+        let result_hex = 0x81280020;
+        assert_eq!(result_bin, result_hex);
+
+        let instruction = Instruction::parse_from_le_bytes(&[0x20, 0x00, 0x28, 0x81]);
+        assert_eq!(instruction.to_machine_code(), result_bin);
+        assert_eq!(instruction.to_instruction(), "lb t0, 32(t1)");
+    }
+    #[test]
+    fn parse_lb_instruction_from_string() {
+        // lb t0, 0x20(t1)
+        let instruction = Instruction::parse_from_str("lb t0, 0x20(t1)").unwrap();
+        let result_bin = 0b10000001001010000000000000100000;
+        let result_hex = 0x81280020;
         assert_eq!(result_bin, result_hex);
         assert_eq!(instruction.to_machine_code(), result_bin);
     }
