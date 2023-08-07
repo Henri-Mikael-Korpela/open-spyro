@@ -180,24 +180,23 @@ impl<'a> PS1ExeWriter<'a> {
     pub fn new(exe: &'a mut PS1Exe) -> Self {
         Self { exe }
     }
-    pub fn write_code(&mut self, address_in_memory: u64, code: &[u8]) {
+    pub fn write_code(&mut self, address_in_memory: u64, code: &[u8]) -> PS1ExeWriteResult {
         let address = self.exe.get_address_by_address_in_memory(address_in_memory);
 
-        // Debug printing to ensure the correct address is being written to
-        let code_print = format!(
-            "Writing code {:?} to {:?}...",
-            code,
-            &self.exe.data[address..address + code.len()]
-        );
-        if *code == self.exe.data[address..address + code.len()] {
-            println!("{}", code_print);
+        let bytes_to_write_into = &mut self.exe.data[address..address + code.len()];
+
+        let result = if *code == *bytes_to_write_into {
+            PS1ExeWriteResult::Unchanged
         } else {
-            use colored::*;
-            println!("{}", code_print.red());
-        }
+            PS1ExeWriteResult::Changed {
+                code: bytes_to_write_into.to_vec(),
+            }
+        };
 
         // Overwrite bytes in the executable file with given code
-        self.exe.data[address..address + code.len()].copy_from_slice(code);
+        bytes_to_write_into.copy_from_slice(code);
+
+        result
     }
     pub fn write_into_file(&self, file_path: &str) -> Result<(), String> {
         let mut file = File::create(file_path).map_err(|err| {
@@ -216,4 +215,9 @@ impl<'a> PS1ExeWriter<'a> {
         })?;
         Ok(())
     }
+}
+
+pub enum PS1ExeWriteResult {
+    Changed { code: Vec<u8> },
+    Unchanged,
 }

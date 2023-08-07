@@ -3,7 +3,7 @@ use std::fs::{self, File, OpenOptions};
 use std::io::Read;
 
 use mips::{parse_nodes, CustomCommand, NodeKind};
-use ps1exe::{PS1Exe, PS1ExeReader, PS1ExeWriter};
+use ps1exe::{PS1Exe, PS1ExeReader, PS1ExeWriteResult, PS1ExeWriter};
 use rom_manager::CDROMXAVolume;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -61,12 +61,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let mut current_address = 0;
 
+            use colored::*;
+
             for node in nodes.iter() {
                 match &node.kind {
                     NodeKind::Assignment(variable_name, value) => {
                         current_address += 4;
-                        println!("Assignment to write: {} = {}", variable_name, value);
-                        ps1_exe_writer.write_code(current_address, value.as_bytes());
+
+                        if let PS1ExeWriteResult::Changed { code } =
+                            ps1_exe_writer.write_code(current_address, value.as_bytes())
+                        {
+                            println!(
+                                "{}",
+                                format!(
+                                    "Assignment {} = {} - changed bytes from {:?} to {:?}",
+                                    variable_name,
+                                    value,
+                                    value.as_bytes(),
+                                    code
+                                )
+                                .red()
+                            );
+                        }
                     }
                     NodeKind::CustomCommand(command) => match command {
                         CustomCommand::At(address) => {
@@ -75,8 +91,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     },
                     NodeKind::Instruction(instruction) => {
                         current_address += 4;
-                        println!("Instruction to write: {}", instruction.to_instruction());
-                        ps1_exe_writer.write_code(current_address, &instruction.to_le_bytes());
+
+                        if let PS1ExeWriteResult::Changed { code } =
+                            ps1_exe_writer.write_code(current_address, &instruction.to_le_bytes())
+                        {
+                            println!(
+                                "{}",
+                                format!(
+                                    "{} - changed bytes from {:?} to {:?}",
+                                    instruction.to_instruction(),
+                                    instruction.to_le_bytes(),
+                                    code
+                                )
+                                .red()
+                            );
+                        }
                     }
                     _ => {}
                 }
@@ -84,6 +113,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             ps1_exe_writer.write_into_file("/home/henri/hobbies/open-spyro/tmp/SCUS_942.28_mod")?;
 
+            println!("Done!");
             Ok(())
         }
         // Disassemble MIPS assembly code from given address (as hexadecimal) memory onwards

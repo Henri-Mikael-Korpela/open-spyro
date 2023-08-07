@@ -219,6 +219,18 @@ impl Instruction {
                     immediate,
                 }
             }
+            // sb, opcode 40
+            0b101000 => {
+                let rt = ((machine_code >> 16) & 0b11111) as u8;
+                let rs = ((machine_code >> 21) & 0b11111) as u8;
+                let immediate = (machine_code & 0xFFFF) as i16; // 0xFFFF = 65535 = 2^16 - 1 = 0b1111111111111111
+                Instruction::ISigned {
+                    opcode,
+                    rs,
+                    rt,
+                    immediate,
+                }
+            }
             // slti, opcode 40
             0b00101000 => {
                 let value = ((machine_code >> 21) & 0b11111) as u8;
@@ -358,18 +370,51 @@ impl Instruction {
             "nop" => Ok(Instruction::Nop),
             "nor" => define_r_instruction_parse!(parts, 0b100111), // Funct is 39
             "or" => define_r_instruction_parse!(parts, 0b100101),  // Funct is 37
-            "sb" => {
-                let rt = parse_register(parts[1]).unwrap_or_else(|e| panic!("{}", e));
-                let value = parts[2].parse::<u8>().unwrap_or_else(|e| panic!("{}", e));
-                let immediate =
-                    parse_immediate_signed(parts[3]).unwrap_or_else(|e| panic!("{}", e));
-                Ok(Instruction::IExceptional {
-                    opcode: 0b101000, // Opcode is 40
-                    rt,
-                    value,
-                    immediate,
-                })
-            }
+            "sb" => match parts[1..] {
+                [rt, immediate, rs] => {
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let immediate =
+                        parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
+                    Ok(Instruction::ISigned {
+                        opcode: 0b101000, // Opcode is 40
+                        rs,
+                        rt,
+                        immediate,
+                    })
+                }
+                [rt, relative_value] => {
+                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+
+                    let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
+
+                    let immediate = relative_value_parts.get(0).unwrap_or_else(|| {
+                        panic!(
+                            "Missing immediate in relative value parts {:?}",
+                            relative_value_parts
+                        )
+                    });
+                    let immediate =
+                        parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
+
+                    let rs = relative_value_parts.get(1).unwrap_or_else(|| {
+                        panic!(
+                            "Missing rs in relative value parts {:?}",
+                            relative_value_parts
+                        )
+                    });
+                    let rs = rs.replace(")", "");
+                    let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+
+                    Ok(Instruction::ISigned {
+                        opcode: 0b101000, // Opcode is 40
+                        rs,
+                        rt,
+                        immediate,
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             "slt" => define_r_instruction_parse!(parts, 0b101010), // Funct is 42
             "slti" => define_i_signed_instruction_parse!(parts, 0b001010), // Opcode is 10
             "sltu" => define_r_instruction_parse!(parts, 0b101011), // Funct is 43
@@ -431,8 +476,7 @@ impl Instruction {
                 value,
                 immediate,
             } => match opcode {
-                0b000101 => format!("bne ${}, ${}, {}", rt, value, immediate),
-                0b101000 => format!("sb ${}, {}(${})", rt, value, immediate),
+                0b000101 => format!("bne ${}, ${}, {}", rt, value, immediate), // Opcode is 5
                 _ => panic!("Unknown opcode \"{}\" for IExceptional instruction", opcode),
             },
             Instruction::ISigned {
@@ -445,12 +489,13 @@ impl Instruction {
                 let rs = REGISTERS[*rs as usize];
 
                 match opcode {
-                    0b001000 => format!("addi {}, {}, {}", rt, rs, immediate),
-                    0b001100 => format!("andi {}, {}, {}", rt, rs, immediate),
-                    0b001111 => format!("lui {}, {}", rt, immediate),
-                    0b100011 => format!("lw {}, {}({})", rt, immediate, rs),
-                    0b001010 => format!("slti {}, {}, {}", rt, rs, immediate),
-                    0b101011 => format!("sw {}, {}({})", rt, immediate, rs),
+                    0b001000 => format!("addi {}, {}, {}", rt, rs, immediate), // Opcode is 8
+                    0b001100 => format!("andi {}, {}, {}", rt, rs, immediate), // Opcode is 12
+                    0b001111 => format!("lui {}, {}", rt, immediate),          // Opcode is 15
+                    0b100011 => format!("lw {}, {}({})", rt, immediate, rs),   // Opcode is 35
+                    0b101000 => format!("sb {}, {}({})", rt, immediate, rs),   // Opcode is 40
+                    0b001010 => format!("slti {}, {}, {}", rt, rs, immediate), // Opcode is 10
+                    0b101011 => format!("sw {}, {}({})", rt, immediate, rs),   // Opcode is 43
                     _ => panic!("Unknown opcode \"{}\" for I instruction", opcode),
                 }
             }

@@ -264,8 +264,26 @@ let balloonist_name_tuco    = "TUCO"     # In Magic Crafters
 let balloonist_name_gosnold = "GOSNOLD"  # In Peace Keepers
 # let balloonist_name_marco = "MARCO"    # In Artisans, shares the same name with a dragon
 
+@at 0x80012204
+main:
+    addiu sp, sp, 65504
+    sw ra, 28(sp)
+    sw s2, 24(sp)
+    sw s1, 20(sp)
+    jal 93794
+    sw s0, 16(sp)
+    jal 18928
+    addiu s2, zero, 1
+    addiu s1, zero, 2
+    addiu s0, zero, 4
+    sb zero, 1540(gp)
+    jal 52759
+    nop
+    lw v0, 1276(gp)
+    sb s2, 1540(gp)
+    sw v0, 1128(gp)
+@at 0x8005b8e0
 start:
-    @at 0x8005b8e0
     lui v0, 32775
     addiu v0, v0, 22080
     lui v1, 32776
@@ -274,12 +292,12 @@ start:
     addiu v0, v0, 4
     sltu at, v0, v1
 
+@at 0x800181ac
 spy_render_text_as_3d_letters_large:
-    @at 0x800181ac
     addiu sp, sp, 65488
     sw s1, 20(sp)
+@at 0x80018728
 spy_render_text_as_3d_for_rescuing_dragon:
-    @at 0x80018728
     lui v0, 0x8007
     lw v0, 0x70C0(v0)
     addiu sp, sp, 0xFFC8
@@ -292,8 +310,8 @@ spy_render_text_as_3d_for_rescuing_dragon:
     nop
     lw v0, 56(v0)
     nop
+@at 0x8001a40c
 spy_render_menu:
-    @at 0x8001a40c
     lui v0, 32775
     lw v0, 22712(v0)
     addiu sp, sp, 65200
@@ -309,8 +327,8 @@ spy_render_menu:
     bne v0, zero, 104
     sw s0, 296(sp)
     jal 84080
+@at 0x80062fd4
 spy_render_text_as_3d_letters_format:
-    @at 0x80062fd4
     sw a1, 4(sp)
     sw a2, 8(sp)
     sw a3, 12(sp)

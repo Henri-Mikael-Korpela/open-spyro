@@ -98,6 +98,7 @@ version = "0.1.0"
 name = "open-spyro"
 version = "0.1.0"
 dependencies = [
+ "colored",
  "mips",
  "ps1exe",
  "rom_manager",
@@ -116,7 +117,6 @@ dependencies = [
 name = "ps1exe"
 version = "0.1.0"
 dependencies = [
- "colored",
  "mips",
 ]
 
