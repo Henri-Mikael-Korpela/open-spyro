@@ -206,6 +206,11 @@ impl Instruction {
                     immediate,
                 }
             }
+            // j, opcode 2
+            0b000010 => {
+                let address = machine_code & 0x3FFFFFF;
+                Instruction::J { opcode, address }
+            }
             // jal, opcode 3
             0b000011 => {
                 let address = machine_code & 0x3FFFFFF;

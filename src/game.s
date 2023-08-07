@@ -292,6 +292,14 @@ main:
     bne v0, zero, 2
     nop
     sw s0, 1128(gp)
+    lw v0, 1336(gp)
+    sw zero, 1276(gp)
+    bne v0, zero, -19
+    nop
+    jal 31575
+    nop
+    j 18571
+    nop
 @at 0x8005b8e0
 start:
     lui v0, 32775
