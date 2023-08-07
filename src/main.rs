@@ -18,6 +18,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok_or_else(|| "No command provided as a command line argument.")?;
 
     match (command.as_str(), &args[2..]) {
+        // Convert machine code into instruction string
+        ("mips-disassemble", [value]) => {
+            let value = u32::from_str_radix(value, 16).map_err(|_| {
+                format!(
+                    "Failed to parse given value \"{}\" as a hexadecimal number.",
+                    value
+                )
+            })?;
+
+            let instruction = mips::Instruction::parse_from_machine_code(value);
+
+            println!("{}", instruction.to_instruction());
+            Ok(())
+        }
         // Assemble MIPS assembly code from a given text file into a Playstation executable
         (
             "ps1exe-assemble",
