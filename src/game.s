@@ -93,163 +93,163 @@ const LEVEL_NAME_STONE_HILL   = "STONE HILL"
 
 # Dragon names
 @at 0x800752e8
-const DRAGON_NAME_REVILO = "REVILO"   # In Jacques. Oliver backwards.
+const DRAGON_NAME_REVILO  = "REVILO"  # In Jacques. Oliver backwards.
 @at 0x800752f0
 const DRAGON_NAME_RASHIDI = "RASHIDI" # Unused in the final game. Probably was or was intended to be located in Jacques.
 @at 0x800752f8
-const DRAGON_NAME_UNIKA = "UNIKA"     # In Jacques.
+const DRAGON_NAME_UNIKA   = "UNIKA"   # In Jacques.
 @at 0x80075300
-const DRAGON_NAME_LUTALO = "LUTALO"   # In Haunted Towers.
+const DRAGON_NAME_LUTALO  = "LUTALO"  # In Haunted Towers.
 @at 0x80075308
-const DRAGON_NAME_COPANO = "COPANO"   # In Haunted Towers.
+const DRAGON_NAME_COPANO  = "COPANO"  # In Haunted Towers.
 @at 0x80075310
-const DRAGON_NAME_KOSOKO = "KOSOKO"   # In Haunted Towers.
+const DRAGON_NAME_KOSOKO  = "KOSOKO"  # In Haunted Towers.
 @at 0x80075318
-const DRAGON_NAME_MUDADA = "MUDADA"   # In Lofty Castle.
+const DRAGON_NAME_MUDADA  = "MUDADA"  # In Lofty Castle.
 @at 0x80075320
-const DRAGON_NAME_BARUTI = "BARUTI"   # In Lofty Castle.
+const DRAGON_NAME_BARUTI  = "BARUTI"  # In Lofty Castle.
 @at 0x80075328
-const DRAGON_NAME_USENI = "USENI"     # In Lofty Castle.
+const DRAGON_NAME_USENI   = "USENI"   # In Lofty Castle.
 @at 0x80075330
-const DRAGON_NAME_OBASI = "OBASI"     # In Dark Passage.
+const DRAGON_NAME_OBASI   = "OBASI"   # In Dark Passage.
 @at 0x80075338
-const DRAGON_NAME_APARA = "APARA"     # In Dark Passage.
+const DRAGON_NAME_APARA   = "APARA"   # In Dark Passage.
 @at 0x80075340
-const DRAGON_NAME_BAKARI = "BAKARI"   # In Dark Passage.
+const DRAGON_NAME_BAKARI  = "BAKARI"  # In Dark Passage.
 @at 0x80075348
-const DRAGON_NAME_AZIZI = "AZIZI"     # In Dark Passage.
+const DRAGON_NAME_AZIZI   = "AZIZI"   # In Dark Passage.
 @at 0x80075350
-const DRAGON_NAME_KASIYA = "KASIYA"   # In Dark Passage.
+const DRAGON_NAME_KASIYA  = "KASIYA"  # In Dark Passage.
 @at 0x80075358
-const DRAGON_NAME_LATEEF = "LATEEF"   # In Dream Weavers homeworld.
+const DRAGON_NAME_LATEEF  = "LATEEF"  # In Dream Weavers homeworld.
 @at 0x80075360
-const DRAGON_NAME_MAZI = "MAZI"       # In Dream Weavers homeworld.
+const DRAGON_NAME_MAZI    = "MAZI"    # In Dream Weavers homeworld.
 @at 0x80075370
-const DRAGON_NAME_SADIKI = "SADIKI"   # In Metalhead.
+const DRAGON_NAME_SADIKI  = "SADIKI"  # In Metalhead.
 @at 0x80075378
-const DRAGON_NAME_JED = "JED"         # In Tree Tops.
+const DRAGON_NAME_JED     = "JED"     # In Tree Tops.
 @at 0x8007537c
-const DRAGON_NAME_LYDE = "LYLE"       # In Tree Tops.
+const DRAGON_NAME_LYDE    = "LYLE"    # In Tree Tops.
 @at 0x80075384
-const DRAGON_NAME_ISAAK = "ISAAK"     # In Tree Tops.
+const DRAGON_NAME_ISAAK   = "ISAAK"   # In Tree Tops.
 @at 0x8007538c
-const DRAGON_NAME_ZEKE = "ZEKE"       # In Misty Bog.
+const DRAGON_NAME_ZEKE    = "ZEKE"    # In Misty Bog.
 @at 0x80075394
-const DRAGON_NAME_BUBBA = "BUBBA"     # In Misty Bog.
+const DRAGON_NAME_BUBBA   = "BUBBA"   # In Misty Bog.
 @at 0x8007539c
-const DRAGON_NAME_DAMON = "DAMON"     # In Misty Bog.
+const DRAGON_NAME_DAMON   = "DAMON"   # In Misty Bog.
 @at 0x800753a4
-const DRAGON_NAME_ROSCO = "ROSCO"     # In Misty Bog.
+const DRAGON_NAME_ROSCO   = "ROSCO"   # In Misty Bog.
 @at 0x800753ac
-const DRAGON_NAME_CYPRIN = "CYPRIN"   # In Terrace Village.
+const DRAGON_NAME_CYPRIN  = "CYPRIN"  # In Terrace Village.
 @at 0x800753b4
-const DRAGON_NAME_CLAUDE = "CLAUDE"   # In Terrace Village.
+const DRAGON_NAME_CLAUDE  = "CLAUDE"  # In Terrace Village.
 @at 0x800753bc
 const DRAGON_NAME_CLEETUS = "CLEETUS" # In Beast Makers homeworld.
 @at 0x800753c4
-const DRAGON_NAME_BRUNO = "BRUNO"     # In Beast Makers homeworld.
+const DRAGON_NAME_BRUNO   = "BRUNO"   # In Beast Makers homeworld.
 @at 0x800753cc
-const DRAGON_NAME_JETHRO = "JETHRO"   # Unused in the final game. Probably was or was intended to be located in one of the Magic Crafters levels.
+const DRAGON_NAME_JETHRO  = "JETHRO"  # Unused in the final game. Probably was or was intended to be located in one of the Magic Crafters levels.
 @at 0x800753d4
-const DRAGON_NAME_FINLAY = "FINLAY"   # Unused in the final game. Probably was or was intended to be located in one of the Magic Crafters levels.
+const DRAGON_NAME_FINLAY  = "FINLAY"  # Unused in the final game. Probably was or was intended to be located in one of the Magic Crafters levels.
 @at 0x800753dc
-const DRAGON_NAME_ALTAIR = "ALTAIR"   # In Blowhard.
+const DRAGON_NAME_ALTAIR  = "ALTAIR"  # In Blowhard.
 @at 0x800753e4
-const DRAGON_NAME_LUCAS = "LUCAS"     # In Wizard Peak.
+const DRAGON_NAME_LUCAS   = "LUCAS"   # In Wizard Peak.
 @at 0x800753ec
-const DRAGON_NAME_JARVIS = "JARVIS"   # In Wizard Peak.
+const DRAGON_NAME_JARVIS  = "JARVIS"  # In Wizard Peak.
 @at 0x800753f4
-const DRAGON_NAME_HEXUS = "HEXUS"     # In Wizard Peak.
+const DRAGON_NAME_HEXUS   = "HEXUS"   # In Wizard Peak.
 @at 0x800753fc
-const DRAGON_NAME_CEDRIC = "CEDRIC"   # In High Caves.
+const DRAGON_NAME_CEDRIC  = "CEDRIC"  # In High Caves.
 @at 0x80075404
-const DRAGON_NAME_AJAX = "AJAX"       # In High Caves.
+const DRAGON_NAME_AJAX    = "AJAX"    # In High Caves.
 @at 0x8007540c
-const DRAGON_NAME_CYRUS = "CYRUS"     # In High Caves.
+const DRAGON_NAME_CYRUS   = "CYRUS"   # In High Caves.
 @at 0x80075414
-const DRAGON_NAME_ZANDER = "ZANDER"   # In Alpine Ridge.
+const DRAGON_NAME_ZANDER  = "ZANDER"  # In Alpine Ridge.
 @at 0x8007541c
-const DRAGON_NAME_KELVIN = "KELVIN"   # In Alpine Ridge.
+const DRAGON_NAME_KELVIN  = "KELVIN"  # In Alpine Ridge.
 @at 0x80075424
-const DRAGON_NAME_ELDRID = "ELDRID"   # In Alpine Ridge.
+const DRAGON_NAME_ELDRID  = "ELDRID"  # In Alpine Ridge.
 @at 0x8007542c
-const DRAGON_NAME_ZANE = "ZANE"       # In Alpine Ridge.
+const DRAGON_NAME_ZANE    = "ZANE"    # In Alpine Ridge.
 @at 0x80075434
-const DRAGON_NAME_BOLDAR = "BOLDAR"   # In Magic Crafters homeworld.
+const DRAGON_NAME_BOLDAR  = "BOLDAR"  # In Magic Crafters homeworld.
 @at 0x8007543c
-const DRAGON_NAME_ZANTOR = "ZANTOR"   # In Magic Crafters homeworld.
+const DRAGON_NAME_ZANTOR  = "ZANTOR"  # In Magic Crafters homeworld.
 @at 0x80075444
-const DRAGON_NAME_COSMOS = "COSMOS"   # In Magic Crafters homeworld.
+const DRAGON_NAME_COSMOS  = "COSMOS"  # In Magic Crafters homeworld.
 @at 0x8007544c
-const DRAGON_NAME_TRONDO = "TRONDO"   # In Doctor Shemp.
+const DRAGON_NAME_TRONDO  = "TRONDO"  # In Doctor Shemp.
 @at 0x80075454
-const DRAGON_NAME_ASHER = "ASHER"     # In Ice Cavern.
+const DRAGON_NAME_ASHER   = "ASHER"   # In Ice Cavern.
 @at 0x8007545c
-const DRAGON_NAME_TODOR = "TODOR"     # In Ice Cavern.
+const DRAGON_NAME_TODOR   = "TODOR"   # In Ice Cavern.
 @at 0x80075464
-const DRAGON_NAME_ULRIC = "ULRIC"     # In Ice Cavern.
+const DRAGON_NAME_ULRIC   = "ULRIC"   # In Ice Cavern.
 @at 0x8007546c
-const DRAGON_NAME_RAGNAR = "RAGNAR"   # In Ice Cavern.
+const DRAGON_NAME_RAGNAR  = "RAGNAR"  # In Ice Cavern.
 @at 0x80075474
-const DRAGON_NAME_ANDOR = "ANDOR"     # In Ice Cavern.
+const DRAGON_NAME_ANDOR   = "ANDOR"   # In Ice Cavern.
 @at 0x8007547c
-const DRAGON_NAME_GALE = "GALE"       # Unused in the final game. Probably was or was intended to be located in Cliff Town.
+const DRAGON_NAME_GALE    = "GALE"    # Unused in the final game. Probably was or was intended to be located in Cliff Town.
 @at 0x80075484
-const DRAGON_NAME_HALVOR = "HALVOR"   # In Cliff Town.
+const DRAGON_NAME_HALVOR  = "HALVOR"  # In Cliff Town.
 @at 0x8007548c
-const DRAGON_NAME_ENZO = "ENZO"       # In Cliff Town.
+const DRAGON_NAME_ENZO    = "ENZO"    # In Cliff Town.
 @at 0x80075494
-const DRAGON_NAME_MARCO = "MARCO"     # In Cliff Town.
+const DRAGON_NAME_MARCO   = "MARCO"   # In Cliff Town.
 @at 0x8007549c
-const DRAGON_NAME_THOR = "THOR"       # In Town Square.
+const DRAGON_NAME_THOR    = "THOR"    # In Town Square.
 @at 0x800754a4
-const DRAGON_NAME_IVOR = "IVOR"       # In Dry Canyon.
+const DRAGON_NAME_IVOR    = "IVOR"    # In Dry Canyon.
 @at 0x800754ac
-const DRAGON_NAME_CONAN = "CONAN"     # In Dry Canyon.
+const DRAGON_NAME_CONAN   = "CONAN"   # In Dry Canyon.
 @at 0x800754b4
 const DRAGON_NAME_MAXIMOS = "MAXIMOS" # In Dry Canyon.
 @at 0x800754bc
-const DRAGON_NAME_BORIS = "BORIS"     # In Dry Canyon.
+const DRAGON_NAME_BORIS   = "BORIS"   # In Dry Canyon.
 @at 0x800754c4
-const DRAGON_NAME_TITAN = "TITAN"     # In Peace Keepers homeworld.
+const DRAGON_NAME_TITAN   = "TITAN"   # In Peace Keepers homeworld.
 @at 0x800754cc
-const DRAGON_NAME_GUNNAR = "GUNNAR"   # In Peace Keepers homeworld.
+const DRAGON_NAME_GUNNAR  = "GUNNAR"  # In Peace Keepers homeworld.
 @at 0x800754d4
-const DRAGON_NAME_MAGNUS = "MAGNUS"   # In Peace Keepers homeworld.
+const DRAGON_NAME_MAGNUS  = "MAGNUS"  # In Peace Keepers homeworld.
 @at 0x800754dc
-const DRAGON_NAME_NEVIN = "NEVIN"     # In Toasty.
+const DRAGON_NAME_NEVIN   = "NEVIN"   # In Toasty.
 @at 0x800754e4
-const DRAGON_NAME_ALVAR = "ALVAR"     # In Town Square.
+const DRAGON_NAME_ALVAR   = "ALVAR"   # In Town Square.
 @at 0x800754ec
-const DRAGON_NAME_TOMAS = "TOMAS"     # In Artisans homeworld.
+const DRAGON_NAME_TOMAS   = "TOMAS"   # In Artisans homeworld.
 @at 0x800754f4
-const DRAGON_NAME_DEVLIN = "DEVLIN"   # In Town Square.
+const DRAGON_NAME_DEVLIN  = "DEVLIN"  # In Town Square.
 @at 0x800754fc
-const DRAGON_NAME_NILS = "NILS"       # In Town Square.
+const DRAGON_NAME_NILS    = "NILS"    # In Town Square.
 @at 0x80075504
-const DRAGON_NAME_ALBAN = "ALBAN"     # In Dark Hollow.
+const DRAGON_NAME_ALBAN   = "ALBAN"   # In Dark Hollow.
 @at 0x8007550c
-const DRAGON_NAME_DARIUS = "DARIUS"   # In Dark Hollow.
+const DRAGON_NAME_DARIUS  = "DARIUS"  # In Dark Hollow.
 @at 0x80075514
-const DRAGON_NAME_OSWIN = "OSWIN"     # In Dark Hollow.
+const DRAGON_NAME_OSWIN   = "OSWIN"   # In Dark Hollow.
 @at 0x8007551c
-const DRAGON_NAME_GAVIN = "GAVIN"     # In Stone Hill. Name is probably a reference to Andy Gavin,
+const DRAGON_NAME_GAVIN   = "GAVIN"   # In Stone Hill. Name is probably a reference to Andy Gavin,
                                       # who worked for Naughty Dog. Naughty Dog had a close
                                       # relationship with Insomniac Games at the time.
 @at 0x80075524
-const DRAGON_NAME_ASTOR = "ASTOR"     # In Stone Hill.
+const DRAGON_NAME_ASTOR   = "ASTOR"   # In Stone Hill.
 @at 0x8007552c
-const DRAGON_NAME_GILDAS = "GILDAS"   # In Stone Hill.
+const DRAGON_NAME_GILDAS  = "GILDAS"  # In Stone Hill.
 @at 0x80075534
-const DRAGON_NAME_LINDAR = "LINDAR"   # In Stone Hill.
+const DRAGON_NAME_LINDAR  = "LINDAR"  # In Stone Hill.
 @at 0x8007553c
-const DRAGON_NAME_NESTOR = "NESTOR"   # In Artisans homeworld.
+const DRAGON_NAME_NESTOR  = "NESTOR"  # In Artisans homeworld.
 @at 0x80075544
-const DRAGON_NAME_DELBIN = "DELBIN"   # In Artisans homeworld.
+const DRAGON_NAME_DELBIN  = "DELBIN"  # In Artisans homeworld.
 @at 0x8007554c
-const DRAGON_NAME_ARGUS = "ARGUS"     # In Artisans homeworld.
+const DRAGON_NAME_ARGUS   = "ARGUS"   # In Artisans homeworld.
 @at 0x80075554
-const DRAGON_NAME_SILVUS = "SILVUS"   # Unused in the final game. Silvus was used in demo builds of the game.
+const DRAGON_NAME_SILVUS  = "SILVUS"  # Unused in the final game. Silvus was used in demo builds of the game.
 
 # Balloonist names
 @at 0x80075580
