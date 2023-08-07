@@ -83,25 +83,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             for node in nodes.iter() {
                 match &node.kind {
-                    NodeKind::Assignment(variable_name, value) => {
-                        current_address += 4;
-
-                        if let PS1ExeWriteResult::Changed { original_code } =
-                            ps1_exe_writer.write_code(current_address, value.as_bytes())
-                        {
-                            println!(
-                                "{}",
-                                format!(
-                                    "Assignment {} = {} - changed bytes to {:?} from {:?}",
-                                    variable_name,
-                                    value,
-                                    value.as_bytes(),
-                                    original_code
-                                )
-                                .red()
-                            );
-                        }
-                    }
                     NodeKind::CustomCommand(command) => match command {
                         CustomCommand::At(address) => {
                             current_address = *address - 4;
@@ -119,6 +100,44 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     "{} - changed bytes to {:?} from {:?}",
                                     instruction.to_instruction(),
                                     instruction.to_le_bytes(),
+                                    original_code
+                                )
+                                .red()
+                            );
+                        }
+                    }
+                    NodeKind::IntegerAssignment(variable_name, value) => {
+                        current_address += 4;
+
+                        if let PS1ExeWriteResult::Changed { original_code } =
+                            ps1_exe_writer.write_code(current_address, &value.to_le_bytes())
+                        {
+                            println!(
+                                "{}",
+                                format!(
+                                    "Assignment {} = {} - changed bytes to {:?} from {:?}",
+                                    variable_name,
+                                    value,
+                                    value.to_le_bytes(),
+                                    original_code
+                                )
+                                .red()
+                            );
+                        }
+                    }
+                    NodeKind::StringAssignment(variable_name, value) => {
+                        current_address += 4;
+
+                        if let PS1ExeWriteResult::Changed { original_code } =
+                            ps1_exe_writer.write_code(current_address, value.as_bytes())
+                        {
+                            println!(
+                                "{}",
+                                format!(
+                                    "Assignment {} = {} - changed bytes to {:?} from {:?}",
+                                    variable_name,
+                                    value,
+                                    value.as_bytes(),
                                     original_code
                                 )
                                 .red()

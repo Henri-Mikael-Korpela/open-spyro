@@ -983,17 +983,23 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
             let variable_name = assignment_parts[0].trim().to_string();
             let variable_value = assignment_parts[1].trim();
 
+            // If the variable value is an integer
+            if let Ok(variable_value) = parse_immediate_signed(variable_value) {
+                nodes.push(Node {
+                    kind: NodeKind::IntegerAssignment(variable_name, variable_value as i32),
+                });
+            }
             // If the variable value is a string
-            if variable_value.starts_with("\"") && variable_value.ends_with("\"") {
+            else if variable_value.starts_with("\"") && variable_value.ends_with("\"") {
                 let variable_value = variable_value[1..variable_value.len() - 1].to_string();
                 nodes.push(Node {
-                    kind: NodeKind::Assignment(variable_name, variable_value),
+                    kind: NodeKind::StringAssignment(variable_name, variable_value),
                 });
             }
             // If the variable value is something else
             else {
                 return Err(format!(
-                    "Could not parse assignment \"{}\": Invalid value format. Only strings marked with double quotes are supported.",
+                    "Could not parse assignment \"{}\": Invalid value format. Only integers and strings marked with double quotes are supported.",
                     line
                 ));
             }
@@ -1348,8 +1354,9 @@ pub struct Node {
 }
 #[derive(Debug, PartialEq)]
 pub enum NodeKind {
-    Assignment(String, String),
+    IntegerAssignment(String, i32),
     CustomCommand(CustomCommand),
     Instruction(Instruction),
     Label(String),
+    StringAssignment(String, String),
 }
