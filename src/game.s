@@ -390,6 +390,81 @@ spy_render_text_as_3d_letters_normal:
     lui v1, 32775
     lw v1, 22288(v1)
     j 24653
+    sh v0, 54(v1)
+    addiu v0, a0, 65471
+    sltiu v0, v0, 26
+    beq v0, zero, 5
+    addiu v0, a0, 361
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24653
+    sh v0, 54(v1)
+    andi v1, a0, 255
+    addiu v0, zero, 47
+    bne v1, v0, 5
+    addiu v0, zero, 63
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24651
+    addiu v0, zero, 277
+    bne v1, v0, 5
+    addiu v0, zero, 37
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24651
+    addiu v0, zero, 278
+    bne v1, v0, 5
+    addiu v0, zero, 94
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24651
+    addiu v0, zero, 272
+    bne v1, v0, 5
+    addiu v0, zero, 43
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24651
+    addiu v0, zero, 321
+    bne v1, v0, 5
+    addiu v0, zero, 327
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24651
+    addiu v0, zero, 317
+    lui v1, 32775
+    lw v1, 22288(v1)
+    nop
+    sh v0, 54(v1)
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 127
+    sb v0, 71(v1)
+    lui v0, 32775
+    lw v0, 22288(v0)
+    nop
+    sb s3, 79(v0)
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 255
+    sb v0, 80(v1)
+    lw v0, 0(s1)
+    addiu s0, s0, 1
+    addu v0, v0, s2
+    sw v0, 0(s1)
+    lbu v1, 0(s0)
+    nop
+    bne v1, zero, -90
+    nop
+    lui v0, 32775
+    lw v0, 22288(v0)
+    lw ra, 32(sp)
+    lw s3, 28(sp)
+    lw s2, 24(sp)
+    lw s1, 20(sp)
+    lw s0, 16(sp)
+    addiu sp, sp, 40
+    jr ra
+    nop
 @at 0x800181ac
 spy_render_text_as_3d_letters_large:
     addiu sp, sp, 65488
