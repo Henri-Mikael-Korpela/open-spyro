@@ -343,6 +343,11 @@ start:
     nop
     jal 18561
     nop
+@at 0x8005db14
+InitHeap:
+    addiu t2, zero, 160
+    jr t2
+    addiu t1, zero, 57
 
 @at 0x80017fe4
 spy_render_text_as_3d_letters_normal:
