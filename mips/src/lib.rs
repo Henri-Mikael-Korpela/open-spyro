@@ -14,6 +14,36 @@ macro_rules! define_i_signed_instruction_parse {
                     immediate,
                 })
             }
+            [rt, relative_value] => {
+                let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+
+                let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
+
+                let immediate = relative_value_parts.get(0).unwrap_or_else(|| {
+                    panic!(
+                        "Missing immediate in relative value parts {:?}",
+                        relative_value_parts
+                    )
+                });
+                let immediate =
+                    parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
+
+                let rs = relative_value_parts.get(1).unwrap_or_else(|| {
+                    panic!(
+                        "Missing rs in relative value parts {:?}",
+                        relative_value_parts
+                    )
+                });
+                let rs = rs.replace(")", "");
+                let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+
+                Ok(Instruction::ISigned {
+                    opcode: $opcode,
+                    rs,
+                    rt,
+                    immediate,
+                })
+            }
             _ => panic!("Unknown structure for instruction \"{}\"", $parts[0]),
         }
     };
@@ -178,6 +208,7 @@ impl Instruction {
             }
             0b100011 => parse_i_signed_instruction(opcode, machine_code), // lw, opcode 35
             0b101000 => parse_i_signed_instruction(opcode, machine_code), // sb, opcode 40
+            0b101001 => parse_i_signed_instruction(opcode, machine_code), // sh, opcode 41
             0b001010 => parse_i_signed_instruction(opcode, machine_code), // slti, opcode 10
             0b001011 => parse_i_unsigned_instruction(opcode, machine_code), // sltiu, opcode 11
             0b00101011 => parse_i_signed_instruction(opcode, machine_code), // sw, opcode 43
@@ -474,6 +505,7 @@ impl Instruction {
                 }
                 _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
             },
+            "sh" => define_i_signed_instruction_parse!(parts, 0b101001), // Opcode is 41
             "sll" => match parts[1..] {
                 [rd, rt, shamt] => {
                     let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
@@ -583,6 +615,7 @@ impl Instruction {
                     0b001111 => format!("lui {}, {}", rt, immediate),          // Opcode is 15
                     0b100011 => format!("lw {}, {}({})", rt, immediate, rs),   // Opcode is 35
                     0b101000 => format!("sb {}, {}({})", rt, immediate, rs),   // Opcode is 40
+                    0b101001 => format!("sh {}, {}({})", rt, immediate, rs),   // Opcode is 41
                     0b001010 => format!("slti {}, {}, {}", rt, rs, immediate), // Opcode is 10
                     0b101011 => format!("sw {}, {}({})", rt, immediate, rs),   // Opcode is 43
                     _ => panic!(
