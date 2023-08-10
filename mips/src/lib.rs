@@ -264,6 +264,19 @@ impl Instruction {
                 }
                 _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
             },
+            "jr" => match parts[1..] {
+                [rs] => {
+                    Ok(Instruction::R {
+                        opcode: 0b000000, // Opcode is 0
+                        rs: parse_register(rs).unwrap_or_else(|e| panic!("{}", e)),
+                        rt: 0,
+                        rd: 0,
+                        shamt: 0,
+                        funct: 0b001000, // Funct is 8
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             "lb" => match parts[1..] {
                 [rt, immediate, rs] => {
                     let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
@@ -620,6 +633,7 @@ impl Instruction {
                     0b100000 => format!("add {}, {}, {}", rd, rs, rt), // Funct is 32
                     0b100001 => format!("addu {}, {}, {}", rd, rs, rt), // Funct is 33
                     0b100100 => format!("and {}, {}, {}", rd, rs, rt), // Funct is 36
+                    0b001000 => format!("jr {}", rs),                  // Funct is 8
                     0b100111 => format!("nor {}, {}, {}", rd, rs, rt), // Funct is 39
                     0b100101 => format!("or {}, {}, {}", rd, rs, rt),  // Funct is 37
                     0b000010 => format!("srl {}, {}, {}", rd, rt, shamt), // Funct is 2
@@ -1194,6 +1208,22 @@ mod tests {
         let instruction = Instruction::parse_from_str("jal 0x32").unwrap();
         let result_bin = 0b00001100000000000000000000110010;
         let result_hex = 0x0C000032;
+        assert_eq!(result_bin, result_hex);
+        assert_eq!(instruction.to_machine_code(), result_bin);
+    }
+
+    #[test]
+    fn disassemble_jr_instruction_from_machine_code() {
+        // jr t0
+        let instruction = Instruction::parse_from_machine_code(0x01000008);
+        assert_eq!(instruction.to_instruction(), "jr t0");
+    }
+    #[test]
+    fn parse_jr_instruction_from_string() {
+        // jr t0
+        let instruction = Instruction::parse_from_str("jr t0").unwrap();
+        let result_bin = 0b00000001000000000000000000001000;
+        let result_hex = 0x01000008;
         assert_eq!(result_bin, result_hex);
         assert_eq!(instruction.to_machine_code(), result_bin);
     }
