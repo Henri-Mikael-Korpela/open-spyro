@@ -5,32 +5,73 @@ use std::io::Read;
 use mips::{parse_nodes, CustomCommand, NodeKind};
 use ps1exe::{PS1Exe, PS1ExeReader, PS1ExeWriteResult, PS1ExeWriter};
 use rom_manager::CDROMXAVolume;
+use wad::{WAD, WADReader};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("------------------");
     println!("    OPEN SPYRO");
     println!("------------------");
 
-    let args = env::args().collect::<Vec<String>>();
+    //let args = env::args().collect::<Vec<String>>();
+    let args = ["", "ps1exe-assemble", "/home/henri/hobbies/open-spyro/src/game.s", "/home/henri/hobbies/open-spyro/tmp/SCUS_942.28_original", "/home/henri/hobbies/open-spyro/tmp/SCUS_942.28_mod"];
+    let args = args.iter().map(|v| v.to_string()).collect::<Vec<_>>();
 
     let command = args
         .get(1)
         .ok_or_else(|| "No command provided as a command line argument.")?;
 
     match (command.as_str(), &args[2..]) {
+        // Convert MIPS assembly instruction into machine code (as hexadecimal) and into LE bytes also
+        ("mips-assemble", [value]) => {
+            let instruction = mips::Instruction::parse_from_str(&value)?;
+            println!("{:x}", instruction.to_machine_code());
+            let instruction_bytes = instruction.to_le_bytes();
+            let instruction_bytes = instruction_bytes
+                .iter()
+                .map(|v| format!("{:x}", v))
+                .collect::<Vec<_>>();
+            println!("{:?}", instruction_bytes);
+            Ok(())
+        }
         // Convert machine code into instruction string
         ("mips-disassemble", [value]) => {
-            let value = u32::from_str_radix(value, 16).map_err(|_| {
-                format!(
-                    "Failed to parse given value \"{}\" as a hexadecimal number.",
+            let value_split = value.split(" ").collect::<Vec<&str>>();
+
+            match value_split.len() {
+                4 => {
+                    let mut bytes = [0u8; 4];
+                    for i in 0..bytes.len() {
+                        let parsed_byte = u8::from_str_radix(value_split[i], 16).map_err(|_| {
+                            format!(
+                                "Failed to parse given byte \"{}\" at index {} as a hexadecimal number.",
+                                value_split[i], i
+                            )
+                        })?;
+                        bytes[i] = parsed_byte;
+                    }
+                    let value = u32::from_le_bytes(bytes);
+                    println!("{:x}", value);
+                    println!("0x{:x}", value);
+                    Ok(())
+                }
+                1 => {
+                    let value = u32::from_str_radix(value, 16).map_err(|_| {
+                        format!(
+                            "Failed to parse given value \"{}\" as a hexadecimal number.",
+                            value
+                        )
+                    })?;
+        
+                    let instruction = mips::Instruction::parse_from_machine_code(value);
+        
+                    println!("{}", instruction.to_instruction());
+                    Ok(())
+                }
+                _ => Err(format!(
+                    "Failed to parse given value \"{}\" as a hexadecimal number or as 4 hexadecimal bytes.",
                     value
-                )
-            })?;
-
-            let instruction = mips::Instruction::parse_from_machine_code(value);
-
-            println!("{}", instruction.to_instruction());
-            Ok(())
+                ).into()),
+            }
         }
         // Assemble MIPS assembly code from a given text file into a Playstation executable
         (
@@ -464,6 +505,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "Replaced file \"{}\" in ROM successfully.",
                 output_file_path
             );
+            Ok(())
+        }
+        // Read WAD file content
+        ("wad-read", [wad_path]) => {
+            let wad = WAD::from_file_path(wad_path)?;
+
+            let wad_reader = WADReader::new(&wad);
+
+            let file_metadatum = wad_reader.read_file_metadatum_from_header()?;
+
+            for (i, file_metadata) in file_metadatum.iter().enumerate() {
+                println!("File #{} metadata: {:?}", i + 1, file_metadata);
+
+                for (j, file) in wad_reader.read_subfiles_by_file_metadata(file_metadata)?.iter().enumerate() {
+                    println!("File #{} content: {:?}", j + 1, file);
+                }
+
+                break;
+            }
+
             Ok(())
         }
         // Failure happened.

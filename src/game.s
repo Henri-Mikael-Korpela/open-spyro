@@ -438,3 +438,18 @@ spy_render_text_as_3d_letters_format:
     sw s0, 552(sp)
     sw a1, 588(sp)
     sw v0, 544(sp)
+
+@at 0x8006b670
+# Erases the data in the given buffer according to given count.
+# The erasure is done by writing 0 to the buffer.
+bzero:
+    beq a0, zero, 9
+    addu v0, zero, zero
+    bgtz a1, 3
+    addu v0, a0, zero
+    j 109990
+    addu v0, zero, zero
+    sb zero, 0(a0)
+    addiu a1, a1, 65535
+    bgtz a1, -3
+    addiu a0, a0, 1
