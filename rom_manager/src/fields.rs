@@ -58,6 +58,7 @@ impl<'a> DateAndTime<'a> {
 
 pub(crate) struct LittleEndian<'a>(pub &'a ByteRange);
 impl<'a> LittleEndian<'a> {
+    #[allow(dead_code)]
     pub fn with_range(range: &'a ByteRange) -> Self {
         Self(&range)
     }

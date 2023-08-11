@@ -469,6 +469,110 @@ spy_render_text_as_3d_letters_normal:
 spy_render_text_as_3d_letters_large:
     addiu sp, sp, 65488
     sw s1, 20(sp)
+    addu s1, a0, zero
+    sw s0, 16(sp)
+    addu s0, a1, zero
+    sw s3, 28(sp)
+    addu s3, a2, zero
+    sw s4, 32(sp)
+    addu s4, a3, zero
+    sw s2, 24(sp)
+    sw ra, 40(sp)
+    sw s5, 36(sp)
+    lbu v1, 0(s1)
+    lw s5, 64(sp)
+    beq v1, zero, 141
+    addiu s2, zero, 1
+    andi v1, v1, 255
+    addiu v0, zero, 32
+    beq v1, v0, 121
+    addu a1, zero, zero
+    lui a0, 32775
+    lw a0, 22288(a0)
+    nop
+    addiu a0, a0, 65448
+    lui at, 32775
+    sw a0, 22288(at)
+    jal 23109
+    addiu a2, zero, 88
+    lui a0, 32775
+    lw a0, 22288(a0)
+    addu a1, s0, zero
+    jal 24000
+    addiu a0, a0, 12
+    lbu v1, 0(s1)
+    addiu v0, zero, 33
+    beq v1, v0, 3
+    addiu v0, zero, 63
+    bne v1, v0, 2
+    nop
+    addiu s2, zero, 1
+    bne s2, zero, 11
+    nop
+    lui a0, 32775
+    lw a0, 22288(a0)
+    lw v1, 4(s3)
+    lw v0, 16(a0)
+    nop
+    addu v0, v0, v1
+    sw v0, 16(a0)
+    lw v0, 8(s3)
+    nop
+    sw v0, 20(a0)
+    lbu a0, 0(s1)
+    nop
+    addiu v0, a0, 65488
+    sltiu v0, v0, 10
+    beq v0, zero, 5
+    addiu v0, a0, 212
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24797
+    sh v0, 54(v1)
+    addiu v0, a0, 65471
+    sltiu v0, v0, 26
+    beq v0, zero, 5
+    addiu v0, a0, 361
+    lui v1, 32775
+    lw v1, 22288(v1)
+    j 24797
+    sh v0, 54(v1)
+    andi v1, a0, 255
+    addiu v0, zero, 33
+    bne v1, v0, 6
+    addiu v0, zero, 44
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 75
+    j 24797
+    sh v0, 54(v1)
+    bne v1, v0, 6
+    addiu v0, zero, 63
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 76
+    j 24797
+    sh v0, 54(v1)
+    bne v1, v0, 6
+    addiu v0, zero, 46
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 278
+    j 24797
+    sh v0, 54(v1)
+    bne v1, v0, 6
+    lui v1, 21845
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 327
+    j 24797
+    sh v0, 54(v1)
+    lui a0, 32775
+    lw a0, 22288(a0)
+    addiu v0, zero, 76
+    sh v0, 54(a0)
+    lw v0, 0(s3)
+    ori v1, v1, 21846
 @at 0x80018728
 spy_render_text_as_3d_for_rescuing_dragon:
     lui v0, 0x8007
@@ -500,6 +604,1196 @@ spy_render_menu:
     bne v0, zero, 104
     sw s0, 296(sp)
     jal 84080
+    addu s3, zero, zero
+    jal 26022
+    addiu s4, zero, 224
+    jal 89330
+    addiu s1, zero, 512
+    jal 82676
+    nop
+    jal 44659
+    nop
+    jal 97753
+    addu a0, zero, zero
+    jal 95985
+    addu a0, zero, zero
+    lui s5, 32775
+    addiu s5, s5, 28384
+    lui a0, 32775
+    lw a0, 22664(a0)
+    jal 98316
+    addiu a0, a0, 92
+    lui s0, 32776
+    addiu s0, s0, 34288
+    lui a0, 32775
+    lw a0, 22664(a0)
+    jal 98166
+    addiu s2, s0, 65528
+    jal 23009
+    addiu a0, zero, 2048
+    jal 98137
+    addu a0, v0, zero
+    jal 97753
+    addu a0, zero, zero
+    jal 95985
+    addu a0, zero, zero
+    lui a0, 32775
+    lw a0, 22664(a0)
+    jal 98316
+    addiu a0, a0, 92
+    lui v1, 65534
+    ori v1, v1, 15872
+    addiu a0, sp, 24
+    addiu v0, zero, 512
+    sh v0, 24(sp)
+    addiu v0, zero, 256
+    sh zero, 26(sp)
+    sh v0, 28(sp)
+    lw a1, 0(s0)
+    addiu v0, zero, 225
+    sh v0, 30(sp)
+    jal 97955
+    addu a1, a1, v1
+    addiu a2, zero, 8
+    LAB_8001a514:
+    lui v1, 32775
+    lw v1, 22664(v1)
+    sll v0, s3, 7
+    beq v1, s5, 2
+    sh v0, 24(sp)
+    addiu a2, zero, 248
+    LAB_8001a52c:
+    addiu a0, sp, 24
+    addiu s3, s3, 1
+    lw a1, 0(s2)
+    addiu v0, zero, 128
+    sh a2, 26(sp)
+    sh v0, 28(sp)
+    jal 97955
+    sh s4, 30(sp)
+    jal 97753
+    addu a0, zero, zero
+    lw a0, 0(s2)
+    jal 24486
+    addiu a1, zero, 28672
+    lw a1, 0(s2)
+    addiu a0, sp, 24
+    sh s1, 24(sp)
+    addiu s1, s1, 64
+    addiu v0, zero, 64
+    sh zero, 26(sp)
+    sh v0, 28(sp)
+    jal 97930
+    sh s4, 30(sp)
+    slti v0, s3, 4
+    bne v0, zero, -30
+    addiu a2, zero, 8
+    addiu a0, sp, 24
+    lui a1, 32775
+    addiu a1, a1, 62224
+    addiu v0, zero, 512
+    sh v0, 24(sp)
+    addiu v0, zero, 224
+    sh v0, 26(sp)
+    addiu v0, zero, 32
+    sh v0, 28(sp)
+    addiu v0, zero, 1
+    jal 97930
+    sh v0, 30(sp)
+    jal 97753
+    addu a0, zero, zero
+    jal 95985
+    addiu a0, zero, 65535
+    lui at, 32775
+    sw v0, 22864(at)
+    j 29074
+    nop
+        LAB_8001a5e0:
+    lui v0, 32775
+    lw v0, 22664(v0)
+    lui a0, 32775
+    addiu a0, a0, 28384
+    bne v0, a0, 2
+    nop
+    addiu a0, a0, 132
+        LAB_8001a5fc:
+    jal 98166
+    addu s3, zero, zero
+    lui a0, 1
+    ori a0, a0, -16384
+    lui a1, 65534
+    ori a1, a1, 15872
+    lui v1, 32776
+    lw v1, -31256(v1)
+    lui v0, 32776
+    lw v0, -31248(v0)
+    lui at, 32775
+    sw zero, 22704(at)
+    lui at, 32775
+    sw v1, 22448(at)
+    addu v1, v1, a0
+    addu v0, v0, a1
+    lui at, 32775
+    sw v1, 22400(at)
+    lui at, 32775
+    sw v0, 22268(at)
+    lui at, 32775
+    sw v0, 22288(at)
+    sll v1, s3, 7
+        LAB_8001a658:
+    addiu a3, s3, 136
+    lui s0, 32775
+    lw s0, 22448(s0)
+    lui v0, 2304
+    sw v0, 0(s0)
+    addiu v0, zero, 44
+    sb v0, 7(s0)
+    addiu v0, zero, 76
+    sb v0, 4(s0)
+    addiu v0, zero, 128
+    sb v0, 5(s0)
+    addiu v0, zero, 8
+    sh v1, 8(s0)
+    sh v0, 10(s0)
+    lhu v0, 8(s0)
+    lhu a1, 10(s0)
+    lhu a2, 8(s0)
+    lhu v1, 10(s0)
+    addiu v0, v0, 128
+    sh v0, 16(s0)
+    lhu v0, 8(s0)
+    addiu v1, v1, 223
+    sh v1, 26(s0)
+    lhu v1, 10(s0)
+    addiu s3, s3, 1
+    sb zero, 13(s0)
+    sh a1, 18(s0)
+    lbu a1, 13(s0)
+    addiu s4, zero, 64
+    sb zero, 12(s0)
+    sh a2, 24(s0)
+    lbu a2, 12(s0)
+    addiu v0, v0, 128
+    sh v0, 32(s0)
+    lbu v0, 12(s0)
+    addiu v1, v1, 223
+    sh v1, 34(s0)
+    lbu v1, 13(s0)
+    addu a0, s0, zero
+    sb s4, 6(s0)
+    sb a1, 21(s0)
+    sb a2, 28(s0)
+    addiu v0, v0, 128
+    sb v0, 20(s0)
+    lbu v0, 12(s0)
+    addiu v1, v1, 65503
+    sb v1, 29(s0)
+    lbu v1, 13(s0)
+    addiu v0, v0, 128
+    addiu v1, v1, 65503
+    sb v0, 36(s0)
+    addiu v0, zero, 14368
+    sb v1, 37(s0)
+    sh v0, 14(s0)
+    jal 23095
+    sh a3, 22(s0)
+    addiu a0, s0, 40
+    slti v0, s3, 4
+    lui at, 32775
+    sw a0, 22448(at)
+    bne v0, zero, -61
+    sll v1, s3, 7
+    lui v0, 768
+    addiu v1, zero, 231
+    sw v0, 40(s0)
+    addiu v0, zero, 512
+    sb s4, 47(s0)
+    sh zero, 48(s0)
+    sh v1, 50(s0)
+    sh v0, 52(s0)
+    sh v1, 54(s0)
+    sb zero, 44(s0)
+    sb zero, 45(s0)
+    jal 23095
+    sb zero, 46(s0)
+    addiu a0, s0, 56
+    lui v1, 32775
+    lw v1, 22488(v1)
+    addiu v0, zero, 2
+    lui at, 32775
+    sw a0, 22448(at)
+    bne v1, v0, 939
+    addiu v0, zero, 3
+    addu s1, a0, zero
+    addiu a1, zero, 1
+    addu a2, zero, zero
+    addiu a3, zero, 64
+    jal 98716
+    sw zero, 16(sp)
+    jal 23095
+    addu a0, s1, zero
+    lui v0, 1280
+    sw v0, 68(s0)
+    addiu v0, zero, 42
+    sb v0, 75(s0)
+    addiu v0, zero, 67
+    sb s4, 72(s0)
+    sb s4, 73(s0)
+    sb s4, 74(s0)
+    lui v1, 32775
+    lw v1, 22472(v1)
+    sh v0, 78(s0)
+    sh v0, 82(s0)
+    addiu v0, zero, 1
+    bne v1, v0, 12
+    addiu s1, s0, 68
+    addiu v0, zero, 84
+    sh v0, 76(s0)
+    lui v0, 32775
+    lw v0, 22232(v0)
+    addiu v1, zero, 428
+    sh v1, 80(s0)
+    sltu v0, zero, v0
+    sb v0, 160(sp)
+    sll v0, v0, 4
+    j 27154
+    addiu v0, v0, 182
+        LAB_8001a82c:
+    addiu t1, zero, 1
+    addiu v0, zero, 140
+    sb t1, 160(sp)
+    sh v0, 76(s0)
+    addiu v0, zero, 372
+    sh v0, 80(s0)
+    addiu v0, zero, 176
+        LAB_8001a848:
+    sh v0, 86(s0)
+    sh v0, 90(s0)
+    lhu v0, 8(s1)
+    lhu v1, 12(s1)
+    addu a0, s1, zero
+    sh v0, 16(s1)
+    jal 23095
+    sh v1, 20(s1)
+    addiu a0, zero, 224
+    addiu a1, zero, 97
+    addiu a2, zero, 288
+    addiu v0, s1, 24
+    lui at, 32775
+    sw v0, 22448(at)
+    jal 24851
+    addiu a3, zero, 97
+    lui v1, 32775
+    lw v1, 22472(v1)
+    addiu v0, zero, 1
+    bne v1, v0, 23
+    addiu a0, zero, 140
+    addiu a0, zero, 84
+    addiu a1, zero, 67
+    addiu a2, zero, 428
+    jal 24851
+    addiu a3, zero, 67
+    addiu a0, zero, 428
+    addiu a1, zero, 67
+    lbu t1, 160(sp)
+    addiu a2, zero, 428
+    sll s0, t1, 4
+    addiu s0, s0, 182
+    jal 24851
+    addu a3, s0, zero
+    addiu a0, zero, 428
+    addu a1, s0, zero
+    addiu a2, zero, 84
+    jal 24851
+    addu a3, s0, zero
+    addiu a0, zero, 84
+    addu a1, s0, zero
+    j 27219
+    addiu a2, zero, 84
+        LAB_8001a8f4:
+    addiu a1, zero, 67
+    addiu a2, zero, 372
+    jal 24851
+    addiu a3, zero, 67
+    addiu a0, zero, 372
+    addiu a1, zero, 67
+    lbu v0, 160(sp)
+    addiu a2, zero, 372
+    sll s0, v0, 3
+    addu s0, s0, v0
+    sll s0, s0, 1
+    addiu s0, s0, 158
+    jal 24851
+    addu a3, s0, zero
+    addiu a0, zero, 372
+    addu a1, s0, zero
+    addiu a2, zero, 140
+    jal 24851
+    addu a3, s0, zero
+    addiu a0, zero, 140
+    addu a1, s0, zero
+    addiu a2, zero, 140
+        LAB_8001a94c:
+    jal 24851
+    addiu a3, zero, 67
+    lui a0, 32775
+    addiu a0, a0, 21952
+    addiu s0, sp, 64
+    addu a1, s0, zero
+    addiu a2, zero, 28
+    addiu a3, zero, 11
+    addiu v0, zero, 186
+    sw v0, 64(sp)
+    addiu v0, zero, 82
+    sw v0, 68(sp)
+    addiu v0, zero, 3072
+    jal 24569
+    sw v0, 72(sp)
+    lui v0, 32775
+    lw v0, 22472(v0)
+    addiu fp, zero, 2
+    # If current menu is Quit game menu
+    bne v0, fp, 86
+    addiu s6, zero, 1
+    lui a0, 32769
+    addiu a0, a0, 2852
+    addu a1, s0, zero
+    addiu s1, sp, 80
+    addu a2, s1, zero
+    addiu a3, zero, 18
+    addiu v0, zero, 16
+    addiu s7, zero, 1
+    sw v0, 80(sp)
+    addiu v0, zero, 5120
+    sw v0, 88(sp)
+    addiu v0, zero, 183
+    sw v0, 64(sp)
+    addiu v0, zero, 119
+    addiu s4, zero, 4352
+    addiu s3, zero, 11
+    sw s7, 84(sp)
+    sw v0, 68(sp)
+    sw s4, 72(sp)
+    jal 24683
+    sw s3, 16(sp)
+    lui a0, 32775
+    addiu a0, a0, 21960
+    addu a1, s0, zero
+    addu a2, s1, zero
+    addiu a3, zero, 18
+    addiu v0, zero, 192
+    addiu s6, zero, 148
+    sw v0, 64(sp)
+    sw s6, 68(sp)
+    sw s4, 72(sp)
+    jal 24683
+    sw s3, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, zero, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 3
+        LAB_8001aa40:
+    lui a0, 32775
+    addiu a0, a0, 21964
+    addu a1, s0, zero
+    addu a2, s1, zero
+    addiu a3, zero, 18
+    addiu v0, zero, 296
+    sw v0, 64(sp)
+    sw s6, 68(sp)
+    sw s4, 72(sp)
+    jal 24683
+    sw s3, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, s7, 5
+    andi a1, s5, 255
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 2
+    andi a1, s5, 255
+        LAB_8001aa90:
+    blez a1, 1706
+    addu s3, zero, zero
+    lui a2, 32775
+    addiu a2, a2, 52344
+    addu a0, zero, zero
+        LAB_8001aaa4:
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu s3, s3, 1
+    sll v0, v0, 3
+    addu v0, v0, a0
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a2
+    lh v1, 0(v0)
+    addiu a0, a0, 12
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    sb v0, 70(s2)
+    slt v0, s3, a1
+    bne v0, zero, -16
+    addiu s2, s2, 88
+    j 29007
+    nop
+        LAB_8001aaf0:
+    bne v0, s6, 558
+    addu a1, s0, zero
+    lui a0, 32769
+    addiu a0, a0, 2864
+    addiu s1, sp, 96
+    addu a2, s1, zero
+    addiu a3, zero, 16
+    addiu v0, zero, 15
+    sw v0, 96(sp)
+    addiu v0, zero, 5632
+    addiu s7, zero, 107
+    sw v0, 104(sp)
+    addiu v0, zero, 108
+    addiu s4, zero, 5120
+    addiu s3, zero, 11
+    sw s6, 100(sp)
+    sw s7, 64(sp)
+    sw v0, 68(sp)
+    sw s4, 72(sp)
+    jal 24683
+    sw s3, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, zero, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 11
+    lui a0, 32769
+    addiu a0, a0, 2880
+    addu a1, s0, zero
+    addu a2, s1, zero
+    addiu a3, zero, 16
+    addiu v0, zero, 121
+    sw v0, 64(sp)
+    addiu v0, zero, 124
+    sw v0, 68(sp)
+    sw s4, 72(sp)
+    jal 24683
+    sw s3, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, s6, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 11
+    lui a0, 32769
+    addiu a0, a0, 2896
+    addu a1, s0, zero
+    addu a2, s1, zero
+    addiu a3, zero, 16
+    addiu v0, zero, 140
+    sw s7, 64(sp)
+    sw v0, 68(sp)
+    sw s4, 72(sp)
+    jal 24683
+    sw s3, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, fp, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 12
+    lui v0, 32775
+    lw v0, 22232(v0)
+    nop
+    beq v0, zero, 20
+    addu a1, s0, zero
+    lui a0, 32769
+    addiu a0, a0, 2912
+    addu a2, s1, zero
+    addiu a3, zero, 16
+    addiu v0, zero, 163
+    sw v0, 64(sp)
+    addiu v0, zero, 156
+    sw v0, 68(sp)
+    sw s4, 72(sp)
+    jal 24683
+    sw s3, 16(sp)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 3
+    bne v1, v0, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 9
+    lui a0, 32775
+    addiu a0, a0, 21968
+    addiu s3, sp, 64
+    addu a1, s3, zero
+    addiu s1, sp, 96
+    addu a2, s1, zero
+    addiu a3, zero, 16
+    addiu v0, zero, 208
+    addiu s6, zero, 4352
+    lbu t1, 160(sp)
+    addiu s4, zero, 11
+    sw v0, 64(sp)
+    sw s6, 72(sp)
+    sll s0, t1, 4
+    addiu v0, s0, 156
+    sw v0, 68(sp)
+    jal 24683
+    sw s4, 16(sp)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 4
+    bne v1, v0, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 6
+    lui a0, 32775
+    addiu a0, a0, 21976
+    addu a1, s3, zero
+    addu a2, s1, zero
+    addiu a3, zero, 16
+    addiu v0, zero, 238
+    sw v0, 64(sp)
+    addiu v0, s0, 172
+    sw v0, 68(sp)
+    sw s6, 72(sp)
+    jal 24683
+    sw s4, 16(sp)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 5
+    bne v1, v0, 5
+    andi a1, s5, 255
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 4
+    andi a1, s5, 255
+    blez a1, 21
+    addu s3, zero, zero
+    lui a2, 32775
+    addiu a2, a2, 52344
+    addu a0, zero, zero
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu s3, s3, 1
+    sll v0, v0, 3
+    addu v0, v0, a0
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a2
+    lh v1, 0(v0)
+    addiu a0, a0, 12
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    sb v0, 70(s2)
+    slt v0, s3, a1
+    bne v0, zero, -16
+    addiu s2, s2, 88
+    lui v0, 32775
+    lw v0, 22356(v0)
+    nop
+    bne v0, zero, 43
+    addiu a1, sp, 64
+    lui a0, 32775
+    addiu a0, a0, 21984
+    addiu a2, sp, 96
+    addiu a3, zero, 16
+    addiu v0, zero, 322
+    sw v0, 64(sp)
+    addiu v0, zero, 108
+    sw v0, 68(sp)
+    addiu v0, zero, 5120
+    sw v0, 72(sp)
+    addiu v0, zero, 11
+    jal 24683
+    sw v0, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, zero, 87
+    addu a0, zero, zero
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addu s3, zero, zero
+    lui a1, 32775
+    addiu a1, a1, 52344
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu s3, s3, 1
+    sll v0, v0, 3
+    addu v0, v0, a0
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a1
+    lh v1, 0(v0)
+    addiu a0, a0, 12
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    sb v0, 70(s2)
+    slti v0, s3, 3
+    bne v0, zero, -16
+    addiu s2, s2, 88
+    j 27594
+    nop
+    blez v0, 61
+    addu s3, zero, zero
+    lui s2, 32775
+    addiu s2, s2, 52344
+    addu s1, zero, zero
+    addiu s0, zero, 320
+    addu a1, zero, zero
+    lui a0, 32775
+    lw a0, 22288(a0)
+    nop
+    addiu a0, a0, 65448
+    lui at, 32775
+    sw a0, 22288(at)
+    jal 23109
+    addiu a2, zero, 88
+    lui a0, 32775
+    lw a0, 22288(a0)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 434
+    sh v0, 54(a0)
+    addiu v0, zero, 109
+    sw v0, 16(a0)
+    addiu v0, zero, 5120
+    sw s0, 12(a0)
+    bne v1, zero, 16
+    sw v0, 20(a0)
+    lui v0, 32775
+    lw v0, 22712(v0)
+    nop
+    sll v0, v0, 3
+    addu v0, v0, s1
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, s2
+    lh v1, 0(v0)
+    nop
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    j 27575
+    sb v0, 70(a0)
+    sb zero, 70(a0)
+    addiu s1, s1, 12
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 127
+    sb v0, 71(v1)
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 11
+    sb v0, 79(v1)
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 255
+    sb v0, 80(v1)
+    lui v0, 32775
+    lw v0, 22356(v0)
+    addiu s3, s3, 1
+    slt v0, s3, v0
+    bne v0, zero, -55
+    addiu s0, s0, 10
+    lui v0, 32775
+    lw v0, 22344(v0)
+    nop
+    bne v0, zero, 43
+    addiu a1, sp, 64
+    lui a0, 32775
+    addiu a0, a0, 21984
+    addiu a2, sp, 96
+    addiu a3, zero, 16
+    addiu v0, zero, 322
+    sw v0, 64(sp)
+    addiu v0, zero, 124
+    sw v0, 68(sp)
+    addiu v0, zero, 5120
+    sw v0, 72(sp)
+    addiu v0, zero, 11
+    jal 24683
+    sw v0, 16(sp)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 1
+    bne v1, v0, 88
+    addu a0, zero, zero
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addu s3, zero, zero
+    lui a1, 32775
+    addiu a1, a1, 52344
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu s3, s3, 1
+    sll v0, v0, 3
+    addu v0, v0, a0
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a1
+    lh v1, 0(v0)
+    addiu a0, a0, 12
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    sb v0, 70(s2)
+    slti v0, s3, 3
+    bne v0, zero, -16
+    addiu s2, s2, 88
+    j 27704
+    nop
+    blez v0, 62
+    addu s3, zero, zero
+    lui s2, 32775
+    addiu s2, s2, 52344
+    addu s1, zero, zero
+    addiu s0, zero, 320
+    addu a1, zero, zero
+    lui a0, 32775
+    lw a0, 22288(a0)
+    nop
+    addiu a0, a0, 65448
+    lui at, 32775
+    sw a0, 22288(at)
+    jal 23109
+    addiu a2, zero, 88
+    lui a0, 32775
+    lw a0, 22288(a0)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 434
+    sh v0, 54(a0)
+    addiu v0, zero, 125
+    sw v0, 16(a0)
+    addiu v0, zero, 5120
+    sw v0, 20(a0)
+    addiu v0, zero, 1
+    bne v1, v0, 16
+    sw s0, 12(a0)
+    lui v0, 32775
+    lw v0, 22712(v0)
+    nop
+    sll v0, v0, 3
+    addu v0, v0, s1
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, s2
+    lh v1, 0(v0)
+    nop
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    j 27685
+    sb v0, 70(a0)
+    sb zero, 70(a0)
+    addiu s1, s1, 12
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 127
+    sb v0, 71(v1)
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 11
+    sb v0, 79(v1)
+    lui v1, 32775
+    lw v1, 22288(v1)
+    addiu v0, zero, 255
+    sb v0, 80(v1)
+    lui v0, 32775
+    lw v0, 22344(v0)
+    addiu s3, s3, 1
+    slt v0, s3, v0
+    bne v0, zero, -56
+    addiu s0, s0, 10
+    lui v1, 32775
+    lw v1, 25152(v1)
+    addiu v0, zero, 322
+    sw v0, 64(sp)
+    addiu v0, zero, 140
+    sw v0, 68(sp)
+    addiu v0, zero, 5120
+    beq v1, zero, 11
+    sw v0, 72(sp)
+    addiu v0, zero, 11
+    sw v0, 16(sp)
+    lui a0, 32775
+    addiu a0, a0, 21988
+    addiu a1, sp, 64
+    addiu a2, sp, 96
+    jal 24683
+    addiu a3, zero, 16
+    j 27732
+    addiu a1, zero, 4
+    addiu v0, zero, 11
+    sw v0, 16(sp)
+    lui a0, 32775
+    addiu a0, a0, 21996
+    addiu a1, sp, 64
+    addiu a2, sp, 96
+    jal 24683
+    addiu a3, zero, 16
+    addiu a1, zero, 6
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 2
+    bne v1, v0, 25
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    beq a1, zero, 21
+    addu s3, zero, zero
+    lui a2, 32775
+    addiu a2, a2, 52344
+    addu a0, zero, zero
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu s3, s3, 1
+    sll v0, v0, 3
+    addu v0, v0, a0
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a2
+    lh v1, 0(v0)
+    addiu a0, a0, 12
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    sb v0, 70(s2)
+    slt v0, s3, a1
+    bne v0, zero, -16
+    addiu s2, s2, 88
+    lui v0, 32775
+    lw v0, 22232(v0)
+    nop
+    beq v0, zero, 57
+    addiu v0, zero, 322
+    lui v1, 32775
+    lw v1, 22436(v1)
+    sw v0, 64(sp)
+    addiu v0, zero, 156
+    sw v0, 68(sp)
+    addiu v0, zero, 5120
+    beq v1, zero, 11
+    sw v0, 72(sp)
+    addiu v0, zero, 11
+    sw v0, 16(sp)
+    lui a0, 32775
+    addiu a0, a0, 22004
+    addiu a1, sp, 64
+    addiu a2, sp, 96
+    jal 24683
+    addiu a3, zero, 16
+    j 27793
+    addiu a1, zero, 2
+    addiu v0, zero, 11
+    sw v0, 16(sp)
+    lui a0, 32775
+    addiu a0, a0, 21984
+    addiu a1, sp, 64
+    addiu a2, sp, 96
+    jal 24683
+    addiu a3, zero, 16
+    addiu a1, zero, 3
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 3
+    bne v1, v0, 25
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    beq a1, zero, 21
+    addu s3, zero, zero
+    lui a2, 32775
+    addiu a2, a2, 52344
+    addu a0, zero, zero
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu s3, s3, 1
+    sll v0, v0, 3
+    addu v0, v0, a0
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a2
+    lh v1, 0(v0)
+    addiu a0, a0, 12
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    sb v0, 70(s2)
+    slt v0, s3, a1
+    bne v0, zero, -16
+    addiu s2, s2, 88
+    lbu t1, 160(sp)
+    lui v1, 32775
+    lw v1, 22804(v1)
+    addiu v0, zero, 322
+    sw v0, 64(sp)
+    sll v0, t1, 4
+    addiu v0, v0, 156
+    sw v0, 68(sp)
+    addiu v0, zero, 5120
+    sw v0, 72(sp)
+    addiu v0, zero, 2
+    bne v1, v0, 10
+    addiu v0, zero, 11
+    sw v0, 16(sp)
+    lui a0, 32775
+    addiu a0, a0, 22008
+    addiu a1, sp, 64
+    addiu a2, sp, 96
+    jal 24683
+    addiu a3, zero, 16
+    j 27852
+    addiu a1, zero, 6
+    sw v0, 16(sp)
+    lui a0, 32775
+    addiu a0, a0, 22016
+    addiu a1, sp, 64
+    addiu a2, sp, 96
+    jal 24683
+    addiu a3, zero, 16
+    addiu a1, zero, 7
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 4
+    bne v1, v0, 1151
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    beq a1, zero, 1147
+    addu s3, zero, zero
+    lui a2, 32775
+    addiu a2, a2, 52344
+    addu a0, zero, zero
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu s3, s3, 1
+    sll v0, v0, 3
+    addu v0, v0, a0
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a2
+    lh v1, 0(v0)
+    addiu a0, a0, 12
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    sb v0, 70(s2)
+    slt v0, s3, a1
+    bne v0, zero, -16
+    addiu s2, s2, 88
+    j 29007
+    nop
+    lui a0, 32769
+    addiu a0, a0, 2924
+    addiu s1, sp, 112
+    addu a2, s1, zero
+    addiu a3, zero, 18
+    addiu v0, zero, 16
+    sw v0, 112(sp)
+    addiu v0, zero, 5120
+    sw v0, 120(sp)
+    addiu v0, zero, 199
+    sw v0, 64(sp)
+    addiu v0, zero, 110
+    addiu s3, zero, 4352
+    addiu s4, zero, 11
+    sw s6, 116(sp)
+    sw v0, 68(sp)
+    sw s3, 72(sp)
+    jal 24683
+    sw s4, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, zero, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 8
+    lui a0, 32775
+    addiu a0, a0, 22024
+    addu a1, s0, zero
+    addu a2, s1, zero
+    addiu a3, zero, 18
+    addiu v0, zero, 207
+    sw v0, 64(sp)
+    addiu v0, zero, 128
+    sw v0, 68(sp)
+    sw s3, 72(sp)
+    jal 24683
+    sw s4, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, s6, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 7
+    lui a0, 32769
+    addiu a0, a0, 2936
+    addu a1, s0, zero
+    addu a2, s1, zero
+    addiu a3, zero, 18
+    addiu s6, zero, 191
+    addiu v0, zero, 146
+    sw s6, 64(sp)
+    sw v0, 68(sp)
+    sw s3, 72(sp)
+    jal 24683
+    sw s4, 16(sp)
+    lui v0, 32775
+    lw v0, 22304(v0)
+    nop
+    bne v0, fp, 4
+    nop
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 9
+    lui v0, 32775
+    lw v0, 22160(v0)
+    nop
+    beq v0, zero, 21
+    addu a1, s0, zero
+    lui a0, 32775
+    addiu a0, a0, 22032
+    addu a2, s1, zero
+    addiu a3, zero, 18
+    addiu v0, zero, 231
+    sw v0, 64(sp)
+    addiu v0, zero, 164
+    sw v0, 68(sp)
+    sw s3, 72(sp)
+    jal 24683
+    sw s4, 16(sp)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 3
+    bne v1, v0, 57
+    andi a1, s5, 255
+    lui s2, 32775
+    lw s2, 22288(s2)
+    j 28026
+    addiu s5, zero, 4
+    lui v0, 26214
+    lui a0, 32775
+    lw a0, 22892(a0)
+    ori v0, v0, 26215
+    mult a0, v0
+    sra v0, a0, 31
+    mfhi t1
+    sra v1, t1, 2
+    subu v1, v1, v0
+    sll v0, v1, 2
+    addu v0, v0, v1
+    sll v0, v0, 1
+    beq a0, v0, 20
+    addu a2, s1, zero
+    lui a0, 32769
+    addiu a0, a0, 2948
+    addiu a3, zero, 18
+    addiu v0, zero, 183
+    sw v0, 64(sp)
+    addiu v0, zero, 164
+    sw v0, 68(sp)
+    sw s3, 72(sp)
+    jal 24683
+    sw s4, 16(sp)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 3
+    bne v1, v0, 24
+    andi a1, s5, 255
+    lui s2, 32775
+    lw s2, 22288(s2)
+    j 28026
+    addiu s5, zero, 9
+    lui a0, 32769
+    addiu a0, a0, 2960
+    addu a1, s0, zero
+    addiu a3, zero, 18
+    addiu v0, zero, 164
+    sw s6, 64(sp)
+    sw v0, 68(sp)
+    sw s3, 72(sp)
+    jal 24683
+    sw s4, 16(sp)
+    lui v1, 32775
+    lw v1, 22304(v1)
+    addiu v0, zero, 3
+    bne v1, v0, 5
+    andi a1, s5, 255
+    lui s2, 32775
+    lw s2, 22288(s2)
+    addiu s5, zero, 8
+    andi a1, s5, 255
+    blez a1, 979
+    addu s3, zero, zero
+    lui a2, 32775
+    addiu a2, a2, 52344
+    addu a0, zero, zero
+    lui v0, 32775
+    lw v0, 22712(v0)
+    addiu s3, s3, 1
+    sll v0, v0, 3
+    addu v0, v0, a0
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a2
+    lh v1, 0(v0)
+    addiu a0, a0, 12
+    sll v0, v1, 1
+    addu v0, v0, v1
+    sra v0, v0, 9
+    sb v0, 70(s2)
+    slt v0, s3, a1
+    bne v0, zero, -16
+    addiu s2, s2, 88
+    j 29007
+    nop
+    bne v1, v0, 955
+    nop
+    jal 44744
+    nop
+    addiu v1, zero, 440
+    sw v1, 64(sp)
+    addiu v1, zero, 44
+    sw v1, 68(sp)
+    addiu v1, zero, 2304
+    addu a2, v0, zero
+    slti v0, a2, 10
+    bne v0, zero, 3
+    sw v1, 72(sp)
+    addiu v0, zero, 406
+    sw v0, 64(sp)
+    slti v0, a2, 100
+    bne v0, zero, 5
+    addiu s2, sp, 32
+    lw v0, 64(sp)
+    nop
+    addiu v0, v0, 65502
+    sw v0, 64(sp)
+    addu a0, s2, zero
 @at 0x80062fd4
 spy_render_text_as_3d_letters_format:
     sw a1, 4(sp)

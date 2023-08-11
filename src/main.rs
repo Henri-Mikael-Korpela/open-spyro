@@ -138,7 +138,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             println!(
                                 "{}",
                                 format!(
-                                    "{} - changed bytes to {:?} from {:?}",
+                                    "Line {}: {} - changed bytes to {:?} from {:?}",
+                                    node.line,
                                     instruction.to_instruction(),
                                     instruction.to_le_bytes(),
                                     original_code
@@ -156,7 +157,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             println!(
                                 "{}",
                                 format!(
-                                    "Assignment {} = {} - changed bytes to {:?} from {:?}",
+                                    "Line {}: Assignment {} = {} - changed bytes to {:?} from {:?}",
+                                    node.line,
                                     variable_name,
                                     value,
                                     value.to_le_bytes(),
@@ -175,7 +177,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             println!(
                                 "{}",
                                 format!(
-                                    "Assignment {} = {} - changed bytes to {:?} from {:?}",
+                                    "Line {}: Assignment {} = {} - changed bytes to {:?} from {:?}",
+                                    node.line,
                                     variable_name,
                                     value,
                                     value.as_bytes(),
@@ -200,6 +203,45 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 output_ps1_exe_file_path
             );
             println!("Done!");
+            Ok(())
+        }
+        // Disassemble MIPS assembly code from one given address (as hexadecimal) memory until another given address
+        ("ps1exe-disassemble", [input_ps1_exe_file_path, start_address_in_memory, until_option, end_address_in_memory]) => {
+            let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
+
+            let start_address_in_memory = u64::from_str_radix(start_address_in_memory, 16).map_err(|_| {
+                format!(
+                    "Failed to parse given start address in memory \"{}\" as a hexadecimal number.",
+                    start_address_in_memory
+                )
+            })?;
+
+            if until_option != "--until" {
+                return Err(format!(
+                    "Invalid option given after the start address \"{}\". Valid until option is \"until\".",
+                    until_option
+                )
+                .into());
+            }
+
+            let end_address_in_memory = u64::from_str_radix(end_address_in_memory, 16).map_err(|_| {
+                format!(
+                    "Failed to parse given end address in memory \"{}\" as a hexadecimal number.",
+                    end_address_in_memory
+                )
+            })?;
+
+            if start_address_in_memory > end_address_in_memory {
+                return Err(format!(
+                    "Start address in memory \"{}\" is greater than end address in memory \"{}\". Start address in memory should be less than end address in memory.",
+                    start_address_in_memory, end_address_in_memory
+                ).into());
+            }
+
+            let ps1_exe_reader = PS1ExeReader::new(&ps1_exe);
+            let instruction_count = (end_address_in_memory - start_address_in_memory) as usize / 4; // 4 bytes per instruction
+            ps1_exe_reader.disassemble_code_at(start_address_in_memory, instruction_count);
+
             Ok(())
         }
         // Disassemble MIPS assembly code from given address (as hexadecimal) memory onwards

@@ -202,7 +202,8 @@ enum DirectoryRecordFileFlag {
     /// the user.
     ///
     /// ([ECMA-119](https://www.ecma-international.org/wp-content/uploads/ECMA-119_4th_edition_june_2019.pdf), 9.1.6)
-    Existance = 1 << 0,
+    #[allow(dead_code)]
+    Existance = 1 << 0, // Unused, but defined here, because it exists in ECMA-119 and ISO-9660 specs.
     /// If set to ZERO, shall mean that the Directory Record does not identify a directory.
     ///
     /// If set to ONE, shall mean that the Directory Record identifies a directory.
@@ -218,7 +219,8 @@ enum DirectoryRecordFileFlag {
     /// ([ECMA-119](https://www.ecma-international.org/wp-content/uploads/ECMA-119_4th_edition_june_2019.pdf), 9.1.6)
     Record = 1 << 3,
     /// ([ECMA-119](https://www.ecma-international.org/wp-content/uploads/ECMA-119_4th_edition_june_2019.pdf), 9.1.6)
-    Protection = 1 << 4,
+    #[allow(dead_code)]
+    Protection = 1 << 4, // Unused, but defined here, because it exists in ECMA-119 and ISO-9660 specs.
     /// ([ECMA-119](https://www.ecma-international.org/wp-content/uploads/ECMA-119_4th_edition_june_2019.pdf), 9.1.6)
     MultiExtent = 1 << 7,
 }
