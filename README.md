@@ -14,6 +14,19 @@ This project will not contain any game data, you must have an original ROM of th
 - Staying true to the original game in terms of functionality
 - Use OpenGL natively for rendering graphics
 
+## Commands
+
+Here's a list CLI commands currently supported:
+
+- `mips-assemble`
+- `mips-disassemble`
+- `ps1exe-assemble`
+- `ps1exe-disassemble`
+- `rom-check`
+- `rom-extract`
+- `rom-replace`
+- `wad-read`
+
 ## Disclaimer
 
 OpenSpyro is an independent project and is not affiliated with the original creators or owners of Spyro the Dragon. It is a fan-driven initiative for educational and entertainment purposes. We do not claim ownership of the original game's assets or intellectual property.
