@@ -230,7 +230,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         }
         "ps1exe-disassemble" => {
-            if args.len() > 3 {
+            if args.len() > 5 {
                 // Disassemble MIPS assembly code from one given address (as hexadecimal) memory until another given address
                 let arg_num = 2;
                 let input_ps1_exe_file_path = args.get(arg_num).ok_or_else(|| {
