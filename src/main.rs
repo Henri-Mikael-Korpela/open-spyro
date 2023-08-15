@@ -22,22 +22,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let command_args = &args[2..];
 
-    match command.as_str() {
-        "mips-assemble" => mips_assemble(command_args),
-        "mips-disassemble" => mips_disassemble(command_args),
-        "ps1exe-assemble" => ps1exe_assemble(command_args),
-        "ps1exe-disassemble" => ps1exe_disassemble(command_args),
-        "rom-check" => rom_check(command_args),
-        "rom-extract" => rom_extract(command_args),
-        "rom-replace" => rom_replace(command_args),
-        "wad-read" => wad_read(command_args),
-        // Failure happened.
-        _ => Err(format!(
-            "No supported command or enough arguments for it provided (command \"{}\" given).",
-            command
-        )
-        .into()),
+    for (command_name, command_function) in COMMANDS.iter() {
+        if command == *command_name {
+            // Requested command found, execute it.
+            return command_function(command_args);
+        }
     }
+
+    Err(format!(
+        "No supported command or enough arguments for it provided (command \"{}\" given).",
+        command
+    )
+    .into())
 }
 
 macro_rules! get_arg {
@@ -55,6 +51,84 @@ macro_rules! get_arg {
     };
 }
 
+const COMMANDS: &[(
+    &str,
+    fn(args: &[String]) -> Result<(), Box<dyn std::error::Error>>,
+)] = &[
+    ("generate-doc", generate_doc),
+    ("mips-assemble", mips_assemble),
+    ("mips-disassemble", mips_disassemble),
+    ("ps1exe-assemble", ps1exe_assemble),
+    ("ps1exe-disassemble", ps1exe_disassemble),
+    ("rom-check", rom_check),
+    ("rom-extract", rom_extract),
+    ("rom-replace", rom_replace),
+    ("wad-read", wad_read),
+];
+
+fn generate_doc(_args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
+    #[inline]
+    fn code(content: &str) -> String {
+        format!("`{}`", content)
+    }
+    fn list_bulleted(items: &[&str]) -> String {
+        items
+            .iter()
+            .map(|item| format!("* {}", item))
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+    fn title(level: usize, content: &str) -> String {
+        format!("{} {}", "#".repeat(level), content)
+    }
+
+    // Initialize all the elements of the README.md file.
+    let mut commands = COMMANDS
+        .iter()
+        .map(|(name, _)| code(name))
+        .collect::<Vec<_>>();
+    // Ensure all commands are sorted alphabetically.
+    commands.sort();
+    let commands = commands.iter().map(|command| command.as_str()).collect::<Vec<_>>();
+    let commands = &commands[..];
+
+    let elements = [
+        title(1, "Open Spyro"),
+        String::from("![Spyro the Dragon screenshot from Dream Weavers](https://www.giantbomb.com/a/uploads/scale_medium/8/82962/1666831-dreamweavers.jpg)"),
+        
+        title(2, "Introduction"),
+        String::from("Welcome to the Spyro the Dragon PC port project called OpenSpyro! OpenSpyro is an open-source initiative driven by a passionate programmer and fan of the original Spyro the Dragon trilogy on Playstation. The project is focused on reverse-engineering and adapting the game to run natively on PC systems. I aim to provide an authentic experience that stays true to the original while leveraging the capabilities of modern hardware."),
+        String::from("This project will not contain any game data, you must have an original ROM of the game available in order to play this port."),
+
+        title(2, "Goals"),
+        list_bulleted(&[
+            "No emulation required to run the game on PC",
+            "Staying true to the original game in terms of functionality",
+            "Use OpenGL natively for rendering graphics"
+        ]),
+
+        title(2, "Commands"),
+        String::from("Here's a list CLI commands currently supported:"),
+        list_bulleted(commands),
+
+        title(2, "Disclaimer"),
+        String::from("OpenSpyro is an independent project and is not affiliated with the original creators or owners of Spyro the Dragon. It is a fan-driven initiative for educational and entertainment purposes. We do not claim ownership of the original game's assets or intellectual property.")
+    ];
+
+    // Write the elements into the README.md file.
+    let current_dir = env::current_dir().unwrap();
+    let current_dir = current_dir.to_str().unwrap();
+
+    let output_file_name = "README.md";
+    let output_file_path = format!("{}/{}", current_dir, output_file_name);
+    let output_file_content = elements.join("\n");
+
+    fs::write(output_file_path, output_file_content)
+        .map_err(|err| format!("Failed to write {}: {}", output_file_name, err))?;
+
+    println!("README.md file generated successfully!");
+    Ok(())
+}
 /// Converts MIPS assembly instruction into machine code (as hexadecimal) and into LE bytes also.
 fn mips_assemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     let value = get_arg!(args, 0, "value")?;
