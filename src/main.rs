@@ -20,13 +20,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .get(1)
         .ok_or_else(|| "No command provided as a command line argument.")?;
 
+    macro_rules! get_arg {
+        ($arg_num: literal, $arg_name: literal) => {
+            args.get($arg_num).ok_or_else(|| {
+                format!(
+                    concat!(
+                        "No ",
+                        $arg_name,
+                        " provided as a command line argument #{}."
+                    ),
+                    $arg_num
+                )
+            })
+        };
+    }
+
     match command.as_str() {
         // Convert MIPS assembly instruction into machine code (as hexadecimal) and into LE bytes also
         "mips-assemble" => {
-            let arg_num = 2;
-            let value = args.get(arg_num).ok_or_else(|| {
-                format!("No value provided as a command line argument #{}.", arg_num)
-            })?;
+            let value = get_arg!(2, "value")?;
 
             let instruction = mips::Instruction::parse_from_str(&value)?;
             println!("{:x}", instruction.to_machine_code());
@@ -41,10 +53,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         // Convert machine code into instruction string
         "mips-disassemble" => {
-            let arg_num = 2;
-            let value = args.get(arg_num).ok_or_else(|| {
-                format!("No value provided as a command line argument #{}.", arg_num)
-            })?;
+            let value = get_arg!(2, "value")?;
 
             let value_split = value.split(" ").collect::<Vec<&str>>();
 
@@ -87,20 +96,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         // Assemble MIPS assembly code from a given text file into a Playstation executable
         "ps1exe-assemble" => {
-            let arg_num = 2;
-            let input_assembly_code_file_path = args.get(arg_num).ok_or_else(|| {
-                format!("No value provided as a command line argument #{}.", arg_num)
-            })?;
-
-            let arg_num = 3;
-            let input_ps1_exe_file_path = args.get(arg_num).ok_or_else(|| {
-                format!("No value provided as a command line argument #{}.", arg_num)
-            })?;
-
-            let arg_num = 4;
-            let output_ps1_exe_file_path = args.get(arg_num).ok_or_else(|| {
-                format!("No value provided as a command line argument #{}.", arg_num)
-            })?;
+            let input_assembly_code_file_path = get_arg!(2, "input assembly code file path")?;
+            let input_ps1_exe_file_path = get_arg!(3, "input PS1 EXE file path")?;
+            let output_ps1_exe_file_path = get_arg!(4, "output PS1 EXE file path")?;
 
             let mut input_file = File::open(input_assembly_code_file_path).map_err(|_| {
                 format!(
@@ -232,45 +230,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "ps1exe-disassemble" => {
             if args.len() > 5 {
                 // Disassemble MIPS assembly code from one given address (as hexadecimal) memory until another given address
-                let arg_num = 2;
-                let input_ps1_exe_file_path = args.get(arg_num).ok_or_else(|| {
-                    format!("No value provided as a command line argument #{}.", arg_num)
-                })?;
+                let input_ps1_exe_file_path = get_arg!(2, "input PS1 EXE file path")?;
 
-                let arg_num = 3;
-                let start_address_in_memory = args.get(arg_num).ok_or_else(|| {
-                    format!(
-                        "No start address in memory provided as a command line argument #{}.",
-                        arg_num
-                    )
-                })?;
-
-                let arg_num = 4;
-                let until_option = args.get(arg_num).ok_or_else(|| {
-                    format!(
-                        "No until option provided as a command line argument #{}.",
-                        arg_num
-                    )
-                })?;
-
-                if until_option != "--until" {
-                    return Err(format!(
-                        "Invalid option given after the start address \"{}\". Valid until option is \"until\".",
-                        until_option
-                    )
-                    .into());
-                }
-
-                let arg_num = 5;
-                let end_address_in_memory = args.get(arg_num).ok_or_else(|| {
-                    format!(
-                        "No end address in memory provided as a command line argument #{}.",
-                        arg_num
-                    )
-                })?;
-
-                let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
-
+                let start_address_in_memory = get_arg!(3, "start address in memory")?;
                 let start_address_in_memory = u64::from_str_radix(start_address_in_memory, 16)
                     .map_err(|_| {
                         format!(
@@ -279,6 +241,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     )
                     })?;
 
+                let until_option = get_arg!(4, "until option")?;
+
                 if until_option != "--until" {
                     return Err(format!(
                         "Invalid option given after the start address \"{}\". Valid until option is \"until\".",
@@ -287,6 +251,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .into());
                 }
 
+                let end_address_in_memory = get_arg!(5, "end address in memory")?;
                 let end_address_in_memory =
                     u64::from_str_radix(end_address_in_memory, 16).map_err(|_| {
                         format!(
@@ -294,6 +259,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         end_address_in_memory
                     )
                     })?;
+
+                let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
 
                 if start_address_in_memory > end_address_in_memory {
                     return Err(format!(
@@ -308,29 +275,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ps1_exe_reader.disassemble_code_at(start_address_in_memory, instruction_count);
             } else {
                 // Disassemble MIPS assembly code from given address (as hexadecimal) memory onwards
-                let arg_num = 2;
-                let input_ps1_exe_file_path = args.get(arg_num).ok_or_else(|| {
-                    format!("No value provided as a command line argument #{}.", arg_num)
-                })?;
+                let input_ps1_exe_file_path = get_arg!(2, "input PS1 EXE file path")?;
 
-                let arg_num = 3;
-                let address_in_memory = args.get(arg_num).ok_or_else(|| {
-                    format!(
-                        "No address in memory provided as a command line argument #{}.",
-                        arg_num
-                    )
-                })?;
-
-                let arg_num = 4;
-                let instruction_count = args.get(arg_num).ok_or_else(|| {
-                    format!(
-                        "No instruction count provided as a command line argument #{}.",
-                        arg_num
-                    )
-                })?;
-
-                let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
-
+                let address_in_memory = get_arg!(3, "address in memory")?;
                 let address_in_memory =
                     u64::from_str_radix(address_in_memory, 16).map_err(|_| {
                         format!(
@@ -339,12 +286,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
                     })?;
 
+                let instruction_count = get_arg!(4, "instruction count")?;
                 let instruction_count = instruction_count.parse::<usize>().map_err(|_| {
                     format!(
                         "Failed to parse given instruction count \"{}\" as a number.",
                         instruction_count
                     )
                 })?;
+
+                let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
 
                 let ps1_exe_reader = PS1ExeReader::new(&ps1_exe);
                 ps1_exe_reader.disassemble_code_at(address_in_memory, instruction_count);
@@ -354,13 +304,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         // Check the given ROM file for validity.
         "rom-check" => {
-            let arg_num = 2;
-            let rom_path = args.get(arg_num).ok_or_else(|| {
-                format!(
-                    "No ROM path provided as a command line argument #{}.",
-                    arg_num
-                )
-            })?;
+            let rom_path = get_arg!(2, "ROM path")?;
 
             // Initialize the volume based on given ROM file path.
             let volume_file = File::open(rom_path)
@@ -507,29 +451,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         // Extracts a file from a given ROM to a given extract path.
         "rom-extract" => {
-            let arg_num = 2;
-            let rom_path = args.get(arg_num).ok_or_else(|| {
-                format!(
-                    "No ROM path provided as a command line argument #{}.",
-                    arg_num
-                )
-            })?;
-
-            let arg_num = 3;
-            let entry_input_path = args.get(arg_num).ok_or_else(|| {
-                format!(
-                    "No entry input path provided as a command line argument #{}.",
-                    arg_num
-                )
-            })?;
-
-            let arg_num = 4;
-            let entry_extract_path = args.get(arg_num).ok_or_else(|| {
-                format!(
-                    "No entry extract path provided as a command line argument #{}.",
-                    arg_num
-                )
-            })?;
+            let rom_path = get_arg!(2, "ROM path")?;
+            let entry_input_path = get_arg!(3, "entry input path")?;
+            let entry_extract_path = get_arg!(4, "entry extract path")?;
 
             // Initialize the volume based on given ROM file path.
             let volume_file = File::open(rom_path)
@@ -595,29 +519,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         // Replaces a file in a given ROM with a given input file.
         "rom-replace" => {
-            let arg_num = 2;
-            let rom_path = args.get(arg_num).ok_or_else(|| {
-                format!(
-                    "No ROM path provided as a command line argument #{}.",
-                    arg_num
-                )
-            })?;
-
-            let arg_num = 3;
-            let input_file_path = args.get(arg_num).ok_or_else(|| {
-                format!(
-                    "No input file path provided as a command line argument #{}.",
-                    arg_num
-                )
-            })?;
-
-            let arg_num = 4;
-            let output_file_path = args.get(arg_num).ok_or_else(|| {
-                format!(
-                    "No output file path provided as a command line argument #{}.",
-                    arg_num
-                )
-            })?;
+            let rom_path = get_arg!(2, "ROM path")?;
+            let input_file_path = get_arg!(3, "input file path")?;
+            let output_file_path = get_arg!(4, "output file path")?;
 
             // Initialize the volume based on given ROM file path.
             let volume_file = OpenOptions::new()
@@ -694,13 +598,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         }
         "wad-read" => {
-            let arg_num = 2;
-            let wad_path = args.get(arg_num).ok_or_else(|| {
-                format!(
-                    "No WAD path provided as a command line argument #{}.",
-                    arg_num
-                )
-            })?;
+            let wad_path = get_arg!(2, "WAD path")?;
 
             let wad = WAD::from_file_path(wad_path)?;
 
