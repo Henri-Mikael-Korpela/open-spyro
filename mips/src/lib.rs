@@ -214,6 +214,7 @@ impl Instruction {
             0b000100 => parse_i_signed_instruction(opcode, machine_code), // beq, opcode 4
             0b000111 => parse_i_signed_instruction(opcode, machine_code), // bgtz, opcode 7
             0b000110 => parse_i_signed_instruction(opcode, machine_code), // blez, opcode 6
+            0b000001 => parse_i_signed_instruction(opcode, machine_code), // bltz, opcode 1
             0b000101 => parse_i_signed_instruction(opcode, machine_code), // bne, opcode 5
             // j, opcode 2
             0b000010 => {
@@ -315,6 +316,21 @@ impl Instruction {
                 }
                 _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
             },
+            "bltz" => match parts[1..] {
+                [rs, address] => {
+                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let immediate =
+                        parse_immediate_signed(address).unwrap_or_else(|e| panic!("{}", e));
+
+                    Ok(Instruction::ISigned {
+                        opcode: 0b000001, // Opcode is 1
+                        rs,
+                        rt: 0,
+                        immediate,
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             "bne" => match parts[1..] {
                 [rs, rt, address] => {
                     Ok(Instruction::ISigned {
@@ -341,6 +357,21 @@ impl Instruction {
                     Ok(Instruction::J {
                         opcode: 0b000011, // Opcode is 3
                         address: parse_address(address).unwrap_or_else(|e| panic!("{}", e)),
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
+            "jalr" => match parts[1..] {
+                [rd, rs] => {
+                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    Ok(Instruction::R {
+                        opcode: 0b000000, // Opcode is 0
+                        rs,
+                        rt: 0,
+                        rd,
+                        shamt: 0,
+                        funct: 0b001001, // Funct is 9
                     })
                 }
                 _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
@@ -711,6 +742,7 @@ impl Instruction {
                     0b000100 => format!("beq {}, {}, {}", rs, rt, immediate),  // Opcode is 4
                     0b000111 => format!("bgtz {}, {}", rs, immediate),         // Opcode is 7
                     0b000110 => format!("blez {}, {}", rs, immediate),         // Opcode is 6
+                    0b000001 => format!("bltz {}, {}", rs, immediate),         // Opcode is 1
                     0b000101 => format!("bne {}, {}, {}", rs, rt, immediate),  // Opcode is 5
                     0b100000 => format!("lb {}, {}({})", rt, immediate, rs),   // Opcode is 32
                     0b100001 => format!("lh {}, {}({})", rt, immediate, rs),   // Opcode is 33
@@ -771,6 +803,7 @@ impl Instruction {
                     0b100000 => format!("add {}, {}, {}", rd, rs, rt), // Funct is 32
                     0b100001 => format!("addu {}, {}, {}", rd, rs, rt), // Funct is 33
                     0b100100 => format!("and {}, {}, {}", rd, rs, rt), // Funct is 36
+                    0b001001 => format!("jalr {}, {}", rd, rs),        // Funct is 9
                     0b001000 => format!("jr {}", rs),                  // Funct is 8
                     0b010000 => format!("mfhi {}", rd),                // Funct is 16
                     0b011000 => format!("mult {}, {}", rs, rt),        // Funct is 24
@@ -1375,6 +1408,48 @@ mod tests {
             let instruction = Instruction::parse_from_str("jal 0x32").unwrap();
             let result_bin = 0b00001100000000000000000000110010;
             let result_hex = 0x0C000032;
+            assert_eq!(result_bin, result_hex);
+            assert_eq!(instruction.to_machine_code(), result_bin);
+        }
+    }
+
+    mod jalr {
+        use super::*;
+
+        #[test]
+        fn disassemble_jalr_instruction_from_bytes() {
+            // jalr t0, t1
+            let result_bin = 0b00000001001000000000000000001001;
+            let result_hex = 0x01200009;
+            assert_eq!(result_bin, result_hex);
+
+            let instruction = Instruction::parse_from_le_bytes(&[0x09, 0xf8, 0x40, 0x00]);
+            //assert_eq!(instruction.to_machine_code(), result_bin);
+            assert_eq!(instruction.to_instruction(), "jalr t0, t1");
+        }
+        #[test]
+        fn disassemble_jalr_instruction_from_machine_code() {
+            // jalr t0, t1
+            let instruction = Instruction::parse_from_machine_code(0x01204009);
+            assert_eq!(instruction.to_instruction(), "jalr t0, t1");
+
+            // jalr v0, ra
+            let instruction = Instruction::parse_from_machine_code(0x03E01009);
+            assert_eq!(instruction.to_instruction(), "jalr v0, ra");
+        }
+        #[test]
+        fn parse_jalr_instruction_from_string() {
+            // jalr t0, t1
+            let instruction = Instruction::parse_from_str("jalr t0, t1").unwrap();
+            let result_bin = 0b1001000000100000000001001;
+            let result_hex = 0x01204009;
+            assert_eq!(result_bin, result_hex);
+            assert_eq!(instruction.to_machine_code(), result_bin);
+
+            // jalr ra, v0
+            let instruction = Instruction::parse_from_str("jalr ra, v0").unwrap();
+            let result_bin = 0b00000000010000001111100000001001;
+            let result_hex = 0x0040f809;
             assert_eq!(result_bin, result_hex);
             assert_eq!(instruction.to_machine_code(), result_bin);
         }

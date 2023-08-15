@@ -300,6 +300,40 @@ main:
     nop
     j 18571
     nop
+
+    @at 0x8004363c
+    jal 66522
+    ori a0, zero, -1031
+    bne v0, zero, 608
+    nop
+    lui a0, 32776
+    addiu a0, a0, 35772
+    lw v0, 0(a0)
+    nop
+    bltz v0, 602
+    nop
+    lui v1, 32776
+    lw v1, -29992(v1)
+    nop
+    slti v0, v1, 61
+    bne v0, zero, 16
+    slti v0, v1, 16
+    lui v0, 32775
+    lw v0, 22312(v0)
+    addiu v1, zero, 65535
+    sw v1, 0(a0)
+    sll v0, v0, 2
+    lui at, 32775
+    addu at, at, v0
+    lw a0, -5568(at)
+    lui v0, 32775
+    lw v0, 22732(v0)
+    nop
+    jalr ra, v0
+    addu a1, zero, zero
+    j 69618
+    nop
+
 @at 0x8005b8e0
 start:
     lui v0, 32775
