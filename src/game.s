@@ -91,6 +91,69 @@ const LEVEL_NAME_DARK_HOLLOW  = "DARK HOLLOW"
 @at 0x800101fc
 const LEVEL_NAME_STONE_HILL   = "STONE HILL"
 
+@at 0x8001973c
+spy_show_level_transition2:
+    lui v0, 26214
+    lui a1, 32775
+    lw a1, 22708(a1)
+    ori v0, v0, 26215
+    mult a1, v0
+    addiu sp, sp, 65432
+    sw ra, 100(sp)
+    sw s2, 96(sp)
+    sw s1, 92(sp)
+    sw s0, 88(sp)
+    sra v0, a1, 31
+    mfhi t0
+    sra a0, t0, 2
+    subu a0, a0, v0
+    addiu v0, a0, 65535
+    sll v1, v0, 1
+    addu v1, v1, v0
+    sll v1, v1, 1
+    sll v0, a0, 2
+    addu v0, v0, a0
+    sll v0, v0, 1
+    subu a0, a1, v0
+    bne a0, zero, 7
+    addu v1, v1, a0
+    lui a1, 32769
+    addiu a1, a1, 2764
+    jal 101365
+    addiu a0, sp, 56
+    j 26116
+    nop
+        LAB_800197b4:
+    slti v0, a1, 60
+    beq v0, zero, 3
+    addiu v0, zero, 4
+    beq a0, v0, 4
+    sll v0, v1, 2
+        LAB_800197c8:
+    addiu v0, zero, 63
+    bne a1, v0, 8
+    sll v0, v1, 2
+        LAB_800197d4:
+    lui at, 32775
+    addu at, at, v0
+    # Entering a boss level
+    lw a2, -2064(at)
+    lui a1, 32769
+    addiu a1, a1, 2784
+    j 26114
+    addiu a0, sp, 56
+        LAB_800197f0:
+    addiu a0, sp, 56
+    lui at, 32775
+    addu at, at, v0
+    # Entering a regular level
+    lw a2, -2064(at)
+    lui a1, 32769
+    addiu a1, a1, 2804
+        LAB_80019808:
+    jal 101365
+    nop
+
 # Dragon names
 @at 0x800752e8
 const DRAGON_NAME_REVILO  = "REVILO"  # In Jacques. Oliver backwards.

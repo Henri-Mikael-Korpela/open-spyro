@@ -554,6 +554,20 @@ impl Instruction {
                 }
                 _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
             },
+            "mflo" => match parts[1..] {
+                [rd] => {
+                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
+                    Ok(Instruction::R {
+                        opcode: 0,
+                        rs: 0,
+                        rt: 0,
+                        rd,
+                        shamt: 0,
+                        funct: 0b010010, // Funct is 18
+                    })
+                }
+                _ => panic!("Unknown structure for instruction \"{}\"", parts[0]),
+            },
             "mult" => match parts[1..] {
                 [rs, rt] => {
                     let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
@@ -806,6 +820,7 @@ impl Instruction {
                     0b001001 => format!("jalr {}, {}", rd, rs),        // Funct is 9
                     0b001000 => format!("jr {}", rs),                  // Funct is 8
                     0b010000 => format!("mfhi {}", rd),                // Funct is 16
+                    0b010010 => format!("mflo {}", rd),                // Funct is 18
                     0b011000 => format!("mult {}, {}", rs, rt),        // Funct is 24
                     0b100111 => format!("nor {}, {}, {}", rd, rs, rt), // Funct is 39
                     0b100101 => format!("or {}, {}, {}", rd, rs, rt),  // Funct is 37
