@@ -1112,8 +1112,8 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
                 }
                 _ => {
                     return Err(format!(
-                        "Could not parse custom command \"{}\": {}",
-                        line, "Unknown custom command"
+                        "Could not parse custom command \"{}\" (line {}): Invalid custom command format.",
+                        line, current_line
                     ));
                 }
             }
