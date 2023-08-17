@@ -1,14 +1,14 @@
 # Homeworld names
 @at 0x80010000
-const LEVEL_NAME_DRAGONX       = "DRAGON X"      # Unused in game. May not be a level title, could be a placeholder name for a dragon name.
+const LEVEL_NAME_DRAGONX        = "DRAGON X"       # Unused in game. May not be a level title, could be a placeholder name for a dragon name.
 @at 0x8001000c
-const LEVEL_NAME_THIGH_MASTERS = "THIGH MASTERS" # Unused in game
+const LEVEL_NAME_THIGH_MASTERS  = "THIGH MASTERS"  # Unused in game
 @at 0x8001001c
-const LEVEL_NAME_GNASTYS_WORLD = "GNASTY'S WORLD"
+const LEVEL_NAME_GNASTYS_WORLD  = "GNASTY'S WORLD"
 @at 0x8001002c
-const LEVEL_NAME_DREAM_WEAVERS = "DREAM WEAVERS"
+const LEVEL_NAME_DREAM_WEAVERS  = "DREAM WEAVERS"
 @at 0x8001003c
-const LEVEL_NAME_BEAST_MAKERS  = "BEAST MAKERS"
+const LEVEL_NAME_BEAST_MAKERS   = "BEAST MAKERS"
 @at 0x8001004c
 const LEVEL_NAME_MAGIC_CRAFTERS = "MAGIC CRAFTERS"
 @at 0x8001005c
