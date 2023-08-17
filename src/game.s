@@ -91,6 +91,20 @@ const LEVEL_NAME_DARK_HOLLOW  = "DARK HOLLOW"
 @at 0x800101fc
 const LEVEL_NAME_STONE_HILL   = "STONE HILL"
 
+@at 0x80010ac0
+const GAME_MODE_DEMO_MODE = "DEMO MODE"
+
+@at 0x80010acc
+const LEVEL_TRANSITION_RETURNING_HOME = "RETURNING HOME..."
+@at 0x80010ae0
+const LEVEL_TRANSITION_CONFRONTING    = "CONFRONTING %s..."
+@at 0x80010af4
+const LEVEL_TRANSITION_ENTERING       = "ENTERING %s..."
+@at 0x80010b04
+const LEVEL_TRANSITION_TREASURE_FOUND = "TREASURE FOUND"
+@at 0x80010b14
+const LEVEL_TRANSITION_TOTAL_TREASURE = "TOTAL TREASURE"
+
 @at 0x8001973c
 spy_show_level_transition2:
     lui v0, 26214
@@ -119,7 +133,7 @@ spy_show_level_transition2:
     addu v1, v1, a0
     lui a1, 32769
     addiu a1, a1, 2764
-    jal 101365
+    jal 101365 # Go to rendering 3D letters from string format
     addiu a0, sp, 56
     j 26116
     nop
