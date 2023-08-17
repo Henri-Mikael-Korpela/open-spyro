@@ -117,6 +117,7 @@ macro_rules! define_r_instruction_parse {
     };
 }
 
+pub const KEYWORD_CONST: &'static str = "const";
 const REGISTERS: &[&'static str; 32] = &[
     "zero", // Constant 0
     "at",   // Assembler temporary (reserved for assembler)
@@ -1017,8 +1018,6 @@ fn parse_i_unsigned_instruction(opcode: u8, machine_code: u32) -> Instruction {
     }
 }
 pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
-    const CONST_KEYWORD: &'static str = "const";
-
     let content_lines = content.split("\n");
 
     // Using this variable instead i iterator in the for loop below,
@@ -1036,8 +1035,8 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
             continue;
         }
         // If the line contains an assignment
-        else if line.starts_with(CONST_KEYWORD) {
-            let assignment_parts = line[CONST_KEYWORD.len()..]
+        else if line.starts_with(KEYWORD_CONST) {
+            let assignment_parts = line[KEYWORD_CONST.len()..]
                 .split("=")
                 .collect::<Vec<&str>>();
 

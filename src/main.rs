@@ -335,61 +335,78 @@ fn ps1exe_disassemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>>
                 )
             })?;
 
-        let until_option = get_arg!(args, 2, "until option")?;
+        let option = get_arg!(args, 2, "until option")?;
 
-        if until_option != "--until" {
+        if option == "--until" {
+            let end_address_in_memory = get_arg!(args, 3, "end address in memory")?;
+                let end_address_in_memory =
+                    u64::from_str_radix(end_address_in_memory, 16).map_err(|_| {
+                        format!(
+                            "Failed to parse given end address in memory \"{}\" as a hexadecimal number.",
+                            end_address_in_memory
+                        )
+                    })?;
+
+                let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
+
+                if start_address_in_memory > end_address_in_memory {
+                    return Err(format!(
+                        "Start address in memory \"{}\" is greater than end address in memory \"{}\". Start address in memory should be less than end address in memory.",
+                        start_address_in_memory, end_address_in_memory
+                    ).into());
+                }
+
+                let ps1_exe_reader = PS1ExeReader::new(&ps1_exe);
+                let instruction_count = (end_address_in_memory - start_address_in_memory) as usize / 4; // 4 bytes per instruction
+                ps1_exe_reader.disassemble_at_adress_by_count(start_address_in_memory, instruction_count);
+        }
+        else{
             return Err(format!(
                 "Invalid option given after the start address \"{}\". Valid until option is \"until\".",
-                until_option
+                option
             )
             .into());
         }
-
-        let end_address_in_memory = get_arg!(args, 3, "end address in memory")?;
-        let end_address_in_memory =
-            u64::from_str_radix(end_address_in_memory, 16).map_err(|_| {
-                format!(
-                    "Failed to parse given end address in memory \"{}\" as a hexadecimal number.",
-                    end_address_in_memory
-                )
-            })?;
-
-        let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
-
-        if start_address_in_memory > end_address_in_memory {
-            return Err(format!(
-                "Start address in memory \"{}\" is greater than end address in memory \"{}\". Start address in memory should be less than end address in memory.",
-                start_address_in_memory, end_address_in_memory
-            ).into());
-        }
-
-        let ps1_exe_reader = PS1ExeReader::new(&ps1_exe);
-        let instruction_count = (end_address_in_memory - start_address_in_memory) as usize / 4; // 4 bytes per instruction
-        ps1_exe_reader.disassemble_code_at(start_address_in_memory, instruction_count);
     } else {
-        // Disassemble MIPS assembly code from given address (as hexadecimal) memory onwards
         let input_ps1_exe_file_path = get_arg!(args, 0, "input PS1 EXE file path")?;
 
-        let address_in_memory = get_arg!(args, 1, "address in memory")?;
-        let address_in_memory = u64::from_str_radix(address_in_memory, 16).map_err(|_| {
+        let start_address_in_memory = get_arg!(args, 1, "address in memory")?;
+        let start_address_in_memory = u64::from_str_radix(start_address_in_memory, 16).map_err(|_| {
             format!(
                 "Failed to parse given address in memory \"{}\" as a hexadecimal number.",
-                address_in_memory
+                start_address_in_memory
             )
         })?;
 
-        let instruction_count = get_arg!(args, 2, "instruction count")?;
-        let instruction_count = instruction_count.parse::<usize>().map_err(|_| {
-            format!(
-                "Failed to parse given instruction count \"{}\" as a number.",
-                instruction_count
-            )
-        })?;
+        let instruction_count_or_option = get_arg!(args, 2, "instruction count")?;
 
-        let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
+        if instruction_count_or_option == "--string" {
+            let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
 
-        let ps1_exe_reader = PS1ExeReader::new(&ps1_exe);
-        ps1_exe_reader.disassemble_code_at(address_in_memory, instruction_count);
+            let ps1_exe_reader = PS1ExeReader::new(&ps1_exe);
+            let end_byte = 0x00; // Null termination byte
+            let value = ps1_exe_reader.disassemble_str_at_address_until_byte(start_address_in_memory, end_byte).map_err(|err| {
+                format!(
+                    "Failed to disassemble string at address \"{}\" until byte \"{}\": {}",
+                    start_address_in_memory, end_byte, err.to_string()
+                )
+            })?;
+            println!("@at 0x{:x}\n{} TEMP = \"{}\"", start_address_in_memory, mips::KEYWORD_CONST, value);
+        }
+        else {
+            // Disassemble MIPS assembly code from given address (as hexadecimal) memory onwards
+            let instruction_count = instruction_count_or_option.parse::<usize>().map_err(|_| {
+                format!(
+                    "Failed to parse given instruction count \"{}\" as a number.",
+                    instruction_count_or_option
+                )
+            })?;
+    
+            let ps1_exe = PS1Exe::from_file_path(&input_ps1_exe_file_path)?;
+    
+            let ps1_exe_reader = PS1ExeReader::new(&ps1_exe);
+            ps1_exe_reader.disassemble_at_adress_by_count(start_address_in_memory, instruction_count);
+        }
     }
 
     Ok(())

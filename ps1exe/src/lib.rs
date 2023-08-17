@@ -157,7 +157,7 @@ pub struct PS1ExeReader<'a> {
     exe: &'a PS1Exe,
 }
 impl<'a> PS1ExeReader<'a> {
-    pub fn disassemble_code_at(&self, address_in_memory: u64, instruction_count: usize) {
+    pub fn disassemble_at_adress_by_count(&self, address_in_memory: u64, instruction_count: usize) {
         let address = self.exe.get_address_by_address_in_memory(address_in_memory);
         const INSTRUCTION_LEN_IN_BYTES: usize = 4;
         for i in 0..instruction_count {
@@ -167,6 +167,33 @@ impl<'a> PS1ExeReader<'a> {
             let instruction = mips::Instruction::parse_from_le_bytes(instruction_bytes);
             println!("{}", instruction.to_instruction());
         }
+    }
+    pub fn disassemble_str_at_address_until_byte(
+        &'a self,
+        address_in_memory: u64,
+        end_byte: u8,
+    ) -> Result<&'a str, String> {
+        const MAX_STR_LENGTH: usize = 256;
+
+        let address = self.exe.get_address_by_address_in_memory(address_in_memory);
+        let bytes_buffer = &self.exe.data[address..address + MAX_STR_LENGTH];
+
+        for i in 0..MAX_STR_LENGTH {
+            if bytes_buffer[i] == end_byte {
+                let str_bytes = &bytes_buffer[0..i];
+                let str = str::from_utf8(str_bytes).map_err(|err| {
+                    format!(
+                        "Failed to UTF-8 encode a string at address 0x{:X}: {}. Bytes found: {:?}",
+                        address_in_memory,
+                        err.to_string(),
+                        str_bytes
+                    )
+                })?;
+                return Ok(str);
+            }
+        }
+
+        Err(format!("Maximum length for requested string reaching while disassemblying: no end byte {} found", end_byte))
     }
     pub fn new(exe: &'a PS1Exe) -> Self {
         Self { exe }
