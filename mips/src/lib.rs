@@ -117,6 +117,7 @@ macro_rules! define_r_instruction_parse {
     };
 }
 
+pub const KEYWORD_ADDR: &'static str = "addr";
 pub const KEYWORD_CONST: &'static str = "const";
 const REGISTERS: &[&'static str; 32] = &[
     "zero", // Constant 0
@@ -1025,6 +1026,8 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
     let mut current_line = 0u64;
     let mut nodes = Vec::new();
 
+    let mut current_address = 0u64;
+
     for line in content_lines {
         current_line += 1;
         let line = line.split("#").collect::<Vec<&str>>();
@@ -1034,7 +1037,16 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
         if line.is_empty() {
             continue;
         }
-        // If the line contains an assignment
+        // If the line contains an address
+        else if line.starts_with(KEYWORD_ADDR) {
+            let addr = line[KEYWORD_ADDR.len()..].trim();
+            nodes.push(Node {
+                address: current_address,
+                kind: NodeKind::Addr(String::from(addr)),
+                line: current_line,
+            });
+        }
+        // If the line contains a constant assignment
         else if line.starts_with(KEYWORD_CONST) {
             let assignment_parts = line[KEYWORD_CONST.len()..]
                 .split("=")
@@ -1053,6 +1065,7 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
             // If the variable value is an integer
             if let Ok(variable_value) = parse_immediate_signed(variable_value) {
                 nodes.push(Node {
+                    address: current_address,
                     kind: NodeKind::IntegerAssignment(variable_name, variable_value as i32),
                     line: current_line,
                 });
@@ -1061,6 +1074,7 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
             else if variable_value.starts_with("\"") && variable_value.ends_with("\"") {
                 let variable_value = variable_value[1..variable_value.len() - 1].to_string();
                 nodes.push(Node {
+                    address: current_address,
                     kind: NodeKind::StringAssignment(variable_name, variable_value),
                     line: current_line,
                 });
@@ -1077,6 +1091,7 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
         else if line.ends_with(":") {
             let label = line[..line.len() - 1].to_string();
             nodes.push(Node {
+                address: current_address,
                 kind: NodeKind::Label(label),
                 line: current_line,
             });
@@ -1088,7 +1103,9 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
             match &custom_command_parts[..] {
                 ["at", address] => {
                     let address = parse_immediate_unsigned_u64(&address)?;
+                    current_address = address;
                     nodes.push(Node {
+                        address: current_address,
                         kind: NodeKind::CustomCommand(CustomCommand::At(address)),
                         line: current_line,
                     });
@@ -1105,6 +1122,7 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
         else {
             let instruction = Instruction::parse_from_str(line)?;
             nodes.push(Node {
+                address: current_address,
                 kind: NodeKind::Instruction(instruction),
                 line: current_line,
             });
@@ -1614,11 +1632,13 @@ pub enum CustomCommand {
 
 #[derive(Debug, PartialEq)]
 pub struct Node {
+    pub address: u64,
     pub kind: NodeKind,
     pub line: u64,
 }
 #[derive(Debug, PartialEq)]
 pub enum NodeKind {
+    Addr(String),
     CustomCommand(CustomCommand),
     IntegerAssignment(String, i32),
     Instruction(Instruction),

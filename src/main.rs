@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::env;
 use std::fs::{self, File, OpenOptions};
 use std::io::Read;
@@ -231,14 +232,50 @@ fn ps1exe_assemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     println!("PS1 EXE initial PC value: 0x{:X}", ps1_exe.initial_pc);
     println!("PS1 EXE ASCII marker: {}", ps1_exe.ascii_marker);
 
-    let mut ps1_exe_writer = PS1ExeWriter::new(&mut ps1_exe);
+    enum UnfinishedOperation{
+        Addr{
+            address: u64,
+            name: String,
+        }
+    }
 
+    let mut constants = HashMap::new();
     let mut current_address = 0;
+    let mut ps1_exe_writer = PS1ExeWriter::new(&mut ps1_exe);
+    let mut unfinished_operations = Vec::new();
 
     use colored::*;
 
     for node in nodes.iter() {
         match &node.kind {
+            NodeKind::Addr(name) => {
+                current_address += 4;
+
+                if let Some(matching_address) = constants.get(name) {
+                    let bytes = (*matching_address as u32).to_le_bytes();
+                    if let PS1ExeWriteResult::Changed { original_code } =
+                        ps1_exe_writer.write_code(current_address, &bytes)
+                    {
+                        println!(
+                            "{}",
+                            format!(
+                                "Line {}: Addr to {} - changed bytes to {:?} from {:?}",
+                                node.line,
+                                name,
+                                bytes,
+                                original_code
+                            )
+                            .red()
+                        );
+                    }
+                }
+                else {
+                    unfinished_operations.push(UnfinishedOperation::Addr{
+                        address: current_address,
+                        name: name.clone(),
+                    });
+                }
+            }
             NodeKind::CustomCommand(command) => match command {
                 CustomCommand::At(address) => {
                     current_address = *address - 4;
@@ -266,6 +303,8 @@ fn ps1exe_assemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
             NodeKind::IntegerAssignment(variable_name, value) => {
                 current_address += 4;
 
+                constants.insert(variable_name, node.address);
+
                 if let PS1ExeWriteResult::Changed { original_code } =
                     ps1_exe_writer.write_code(current_address, &value.to_le_bytes())
                 {
@@ -286,6 +325,8 @@ fn ps1exe_assemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
             NodeKind::StringAssignment(variable_name, value) => {
                 current_address += 4;
 
+                constants.insert(variable_name, node.address);
+
                 if let PS1ExeWriteResult::Changed { original_code } =
                     ps1_exe_writer.write_code(current_address, value.as_bytes())
                 {
@@ -304,6 +345,35 @@ fn ps1exe_assemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             _ => {}
+        }
+    }
+
+    for operation in unfinished_operations.iter() {
+        match operation {
+            UnfinishedOperation::Addr { address, name } => {
+                if let Some(matching_address) = constants.get(name) {
+                    let bytes = (*matching_address as u32).to_le_bytes();
+                    if let PS1ExeWriteResult::Changed { original_code } =
+                        ps1_exe_writer.write_code(*address, &bytes)
+                    {
+                        println!(
+                            "{}",
+                            format!(
+                                "Addr to {} - changed bytes to {:?} from {:?}",
+                                name, bytes, original_code
+                            )
+                            .red()
+                        );
+                    }
+                }
+                else {
+                    return Err(format!(
+                        "Failed to find constant \"{}\" at address {}.",
+                        name, address
+                    )
+                    .into());
+                }
+            }
         }
     }
 
