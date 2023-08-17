@@ -327,8 +327,35 @@ fn ps1exe_assemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
                 constants.insert(variable_name, node.address);
 
+                let value_bytes = value.as_bytes();
+                let mut new_value_bytes = Vec::<u8>::with_capacity(value_bytes.len() + 1);
+
+                let mut i = 0;
+                while i < value_bytes.len() {
+                    let b = value_bytes[i];
+                    // If byte is a backslash (\)
+                    if b == 92 && (i + 1) < value_bytes.len() {
+                        i += 1;
+                        // If byte is 0 digit (null termination byte)
+                        if value_bytes[i] == 48 {
+                            i += 1;
+                            new_value_bytes.push(0);
+                        }
+                        else{
+                            return Err(format!(
+                                "Failed to parse given string \"{}\". Invalid escape sequence \"\\{}\" at index {}.",
+                                value, value_bytes[i], i
+                            ).into());
+                        }
+                    }
+                    else{
+                        new_value_bytes.push(b);
+                    }
+                    i += 1;
+                }
+
                 if let PS1ExeWriteResult::Changed { original_code } =
-                    ps1_exe_writer.write_code(current_address, value.as_bytes())
+                    ps1_exe_writer.write_code(current_address, &new_value_bytes[..])
                 {
                     println!(
                         "{}",
