@@ -46,7 +46,7 @@ macro_rules! get_arg {
                     $arg_name,
                     " provided as a command line argument #{}."
                 ),
-                $arg_num
+                $arg_num + 2
             )
         })
     };
