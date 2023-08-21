@@ -529,6 +529,34 @@ InitHeap:
     addiu t1, zero, 57
 
 @at 0x80017fe4
+# spy_render_text_as_3d_letters_normal(
+#     text_content: *byte,
+#     text_width: *int,
+#     char_space_width: int,
+#     color_type: undefined
+# ) -> int
+
+# color_type: Has the following values supported
+# 0-1 = gray shaded
+# 2   = golden shaded (original)
+# 3-6 = black solid
+# 7   = gray solid
+# 8   = red shaded
+# 9   = green shaded
+# 10  = blue shaded
+# 11  = golden shaded
+# 12  = gray shaded
+# 13  = red shaded
+# 14  = green shaded
+# 15  = blue shaded
+# 16  = golden shaded
+# 17  = gray shaded
+# 18  = red shaded
+# 19  = green shaded
+# 20  = blue shaded
+# 21... seems to go on with this pattern
+# 255 = white solid, looked like overexposed, probably unintended look
+# 256 = looked like transparent gray solid, probably unintended look
 spy_render_text_as_3d_letters_normal:
     addiu sp, sp, 65496
     sw s0, 16(sp)
@@ -753,11 +781,12 @@ spy_render_text_as_3d_letters_large:
     lw v0, 0(s3)
     ori v1, v1, 21846
 @at 0x80018728
+# Renders text as 3D letters after rescuing a dragon.
 spy_render_text_as_3d_for_rescuing_dragon:
-    lui v0, 0x8007
-    lw v0, 0x70C0(v0)
-    addiu sp, sp, 0xFFC8
-    sw ra, 0x0030(sp)
+    lui v0, 32775
+    lw v0, 28864(v0)
+    addiu sp, sp, 65480
+    sw ra, 48(sp)
     sw s3, 44(sp)
     sw s2, 40(sp)
     sw s1, 36(sp)
@@ -765,6 +794,80 @@ spy_render_text_as_3d_for_rescuing_dragon:
     lw v0, 0(v0)
     nop
     lw v0, 56(v0)
+    nop
+    sll v0, v0, 2
+    lui at, 32775
+    addu at, at, v0
+    lw s2, -2412(at)
+    jal 100827
+    addu a0, s2, zero
+    lui a0, 32775
+    addiu a0, a0, 21932
+    addiu a1, sp, 16
+    addiu a2, zero, 20
+    addiu a3, zero, 2
+    addiu v0, v0, 65535
+    sll s0, v0, 1
+    addu s0, s0, v0
+    sll s0, s0, 2
+    addu s0, s0, v0
+    addiu v0, zero, 176
+    subu v0, v0, s0
+    lui s3, 32775
+    lw s3, 22288(s3)
+    addiu s1, zero, 200
+    sw v0, 16(sp)
+    addiu v0, zero, 4096
+    sw s1, 20(sp)
+    # Display "RESCUED" message after freeing a dragon
+    jal 24569 # spy_render_text_as_3d_letters_normal
+    sw v0, 24(sp)
+    addu a0, s2, zero
+    addiu a1, sp, 16 
+    addiu a2, zero, 26 # Controls width of a single character
+    addiu a3, zero, 2 # Text color
+    addiu v0, zero, 336
+    subu v0, v0, s0
+    sw v0, 16(sp)
+    addiu v0, zero, 3072
+    sw s1, 20(sp)
+    # Display name of the rescued dragon in larger text
+    jal 24569 # spy_render_text_as_3d_letters_normal
+    sw v0, 24(sp)
+    lui v0, 32775
+    lw v0, 22288(v0)
+    addiu s3, s3, 65448
+    slt v0, s3, v0
+    bne v0, zero, 22
+    addu v1, zero, zero
+    lui a1, 32775
+    addiu a1, a1, 28800
+    lui a0, 32775
+    addiu a0, a0, 52344
+    lw v0, 0(a1)
+    nop
+    sll v0, v0, 1
+    addu v0, v0, v1
+    andi v0, v0, 255
+    sll v0, v0, 1
+    addu v0, v0, a0
+    lhu v0, 0(v0)
+    nop
+    srl v0, v0, 7
+    sb v0, 70(s3)
+    lui v0, 32775
+    lw v0, 22288(v0)
+    addiu s3, s3, 65448
+    slt v0, s3, v0
+    beq v0, zero, -16
+    addiu v1, v1, 12
+    lw ra, 48(sp)
+    lw s3, 44(sp)
+    lw s2, 40(sp)
+    lw s1, 36(sp)
+    lw s0, 32(sp)
+    addiu sp, sp, 56
+    jr ra
     nop
 @at 0x8001a40c
 spy_render_menu:
