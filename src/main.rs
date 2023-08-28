@@ -14,8 +14,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("------------------");
 
     let args = env::args().collect::<Vec<String>>();
-    //let args = ["", "ps1exe-assemble", "/home/henri/hobbies/open-spyro/src/game.s", "/home/henri/hobbies/open-spyro/tmp/SCUS_942.28_original", "/home/henri/hobbies/open-spyro/tmp/SCUS_942.28_mod"];
-    //let args = args.iter().map(|v| v.to_string()).collect::<Vec<_>>();
 
     let command = args
         .get(1)
