@@ -115,7 +115,7 @@ fn generate_doc(_args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
         list_bulleted(commands),
 
         title(2, "Disclaimer"),
-        String::from("OpenSpyro is an independent project and is not affiliated with the original creators or owners of Spyro the Dragon. It is a fan-driven initiative for educational and entertainment purposes. We do not claim ownership of the original game's assets or intellectual property."),
+        String::from("OpenSpyro is an independent project and is not affiliated with the original creators or owners of Spyro the Dragon. It is a fan-driven initiative for educational and entertainment purposes. I do not claim ownership of the original game's assets or intellectual property."),
         String::from("I am still learning about reverse engineering, how the Playstation works and how porting with all its intricacies when its comes to like audio and graphics should be handled. I am not an expert. Suggestions and help is welcome and appreciated.")
     ];
 
