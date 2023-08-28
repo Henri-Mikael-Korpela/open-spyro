@@ -125,7 +125,7 @@ fn generate_doc(_args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
     let output_file_name = "README.md";
     let output_file_path = format!("{}/{}", current_dir, output_file_name);
-    let output_file_content = elements.join("\n");
+    let output_file_content = elements.join("\n\n");
 
     fs::write(output_file_path, output_file_content)
         .map_err(|err| format!("Failed to write {}: {}", output_file_name, err))?;
