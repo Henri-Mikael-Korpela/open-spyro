@@ -93,25 +93,30 @@ fn generate_doc(_args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
     let elements = [
         title(1, "Open Spyro"),
-        String::from("![Spyro the Dragon screenshot from Dream Weavers](https://www.giantbomb.com/a/uploads/scale_medium/8/82962/1666831-dreamweavers.jpg)"),
+        String::from("![Spyro the Dragon screenshot from Town Square](http://henrijahanna.fi/projects/open_spyro/spyro_town_square.bmp)"),
         
         title(2, "Introduction"),
-        String::from("Welcome to the Spyro the Dragon PC port project called OpenSpyro! OpenSpyro is an open-source initiative driven by a passionate programmer and fan of the original Spyro the Dragon trilogy on Playstation. The project is focused on reverse-engineering and adapting the game to run natively on PC systems. I aim to provide an authentic experience that stays true to the original while leveraging the capabilities of modern hardware."),
-        String::from("This project will not contain any game data, you must have an original ROM of the game available in order to play this port."),
+        String::from("Welcome to the Spyro the Dragon PC port project called OpenSpyro! OpenSpyro is an open-source initiative driven by a passionate programmer and fan of the original Spyro the Dragon trilogy on Playstation. The project is focused on reverse-engineering and adapting the game to run natively on Linux and Windows. I aim to provide an authentic experience that stays true to the original while leveraging the capabilities of modern hardware."),
+        String::from("This project will not contain any game data in its original form, you must have an original ROM of the game available in order to play this port."),
 
         title(2, "Goals"),
         list_bulleted(&[
-            "No emulation required to run the game on PC",
-            "Staying true to the original game in terms of functionality",
-            "Use OpenGL natively for rendering graphics"
+            "No emulation required to run the game on Linux and Windows",
+            "Maintaining the original experience while leveraging the capabilities of modern hardware",
         ]),
+
+        title(2, "Current state"),
+        String::from("The project is currently in its early stages. Port is currently unplayable. Some of the MIPS assembly code has been disassembled with comments and labels added. Disassembly is into a completely custom assembly, this repository even has its own assembler and disassembler! This custom assembler and disassembler ought to have more documentation, but it is still in the works."),
+        String::from("The project is currently focused on reverse-engineering the MIPS assembly and understanding how the data is layed out on the ROM. Some tools have been built along the way, like a working ROM file replacer, which is used for saving Playstation executable files back into the ROM file. Some work has been started on reading WAD files, but it is in its early stages."),
+        String::from("ROM currently supported is an NTSC version. I have not worked on any other versions yet."),
 
         title(2, "Commands"),
         String::from("Here's a list CLI commands currently supported:"),
         list_bulleted(commands),
 
         title(2, "Disclaimer"),
-        String::from("OpenSpyro is an independent project and is not affiliated with the original creators or owners of Spyro the Dragon. It is a fan-driven initiative for educational and entertainment purposes. We do not claim ownership of the original game's assets or intellectual property.")
+        String::from("OpenSpyro is an independent project and is not affiliated with the original creators or owners of Spyro the Dragon. It is a fan-driven initiative for educational and entertainment purposes. We do not claim ownership of the original game's assets or intellectual property."),
+        String::from("I am still learning about reverse engineering, how the Playstation works and how porting with all its intricacies when its comes to like audio and graphics should be handled. I am not an expert. Suggestions and help is welcome and appreciated.")
     ];
 
     // Write the elements into the README.md file.
