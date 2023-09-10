@@ -18,6 +18,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "cmips"
+version = "0.1.0"
+
+[[package]]
 name = "colored"
 version = "2.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -98,6 +102,7 @@ version = "0.1.0"
 name = "open-spyro"
 version = "0.1.0"
 dependencies = [
+ "cmips",
  "colored",
  "mips",
  "ps1exe",
