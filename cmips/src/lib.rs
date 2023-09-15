@@ -18,7 +18,10 @@ pub fn tokenize(code: &str) -> Vec<Token> {
     let code_chars_count = code.chars().count();
 
     let mut i = 0;
-    let mut tokens = Vec::new();
+    // The vector is initialized with the exact capacity needed to avoid
+    // reallocations. Because characters are parsed into tokens, the number
+    // of tokens will always be less than or equal to the number of characters.
+    let mut tokens = Vec::with_capacity(code.len());
 
     macro_rules! char_at {
         ($index:expr) => {
