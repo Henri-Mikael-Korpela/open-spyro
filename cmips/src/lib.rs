@@ -1,5 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum Token<'a> {
+    Assignment,
     Identifier(&'a str),
     KeywordIf,
     KeywordProc,
@@ -8,6 +9,7 @@ pub enum Token<'a> {
     LiteralBoolTrue,
     OperatorBraceClose,
     OperatorBraceOpen,
+    OperatorEquality,
     OperatorParenthesisClose,
     OperatorParenthesisOpen,
 }
@@ -27,163 +29,65 @@ pub fn tokenize(code: &str) -> Vec<Token> {
     loop {
         if i >= code_chars_count {
             break;
-        } else {
-            let c = char_at!(i);
+        }
 
-            match c {
-                '}' => tokens.push(Token::OperatorBraceClose),
-                '{' => tokens.push(Token::OperatorBraceOpen),
-                ')' => tokens.push(Token::OperatorParenthesisClose),
-                '(' => tokens.push(Token::OperatorParenthesisOpen),
-                'f' => {
-                    // If the following characters result in "false"
-                    if (i + 4) < code_chars_count
-                        && char_at!(i + 1) == 'a'
-                        && char_at!(i + 2) == 'l'
-                        && char_at!(i + 3) == 's'
-                        && char_at!(i + 4) == 'e'
-                    {
-                        tokens.push(Token::LiteralBoolFalse);
-                        i += 5;
-                        continue;
-                    } else {
-                        if c.is_alphabetic() {
-                            let identifier_begin = i;
-                            i += 1;
-                            'identifier_loop: while let Some(c) = code.chars().nth(i) {
-                                if c.is_alphanumeric() || c == '_' {
-                                    i += 1;
-                                    // If there are no characters left after identifier, push the identifier
-                                    if i >= code_chars_count {
-                                        tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                        break 'identifier_loop;
-                                    }
-                                } else {
-                                    tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                    i -= 1;
-                                    break 'identifier_loop;
-                                }
-                            }
-                        }
-                    }
-                }
-                'i' => {
-                    // If the following characters result in "if"
-                    if (i + 1) < code_chars_count && char_at!(i + 1) == 'f' {
-                        tokens.push(Token::KeywordIf);
-                        i += 2;
-                    } else {
-                        if c.is_alphabetic() {
-                            let identifier_begin = i;
-                            i += 1;
-                            'identifier_loop: while let Some(c) = code.chars().nth(i) {
-                                if c.is_alphanumeric() || c == '_' {
-                                    i += 1;
-                                    // If there are no characters left after identifier, push the identifier
-                                    if i >= code_chars_count {
-                                        tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                        break 'identifier_loop;
-                                    }
-                                } else {
-                                    tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                    i -= 1;
-                                    break 'identifier_loop;
-                                }
-                            }
-                        }
-                    }
-                }
-                'p' => {
-                    // If the following characters result in "proc"
-                    if (i + 3) < code_chars_count
-                        && char_at!(i + 1) == 'r'
-                        && char_at!(i + 2) == 'o'
-                        && char_at!(i + 3) == 'c'
-                    {
-                        tokens.push(Token::KeywordProc);
-                        i += 4;
-                    }
-                    // If the following characters result in "pub"
-                    else if (i + 2) < code_chars_count
-                        && char_at!(i + 1) == 'u'
-                        && char_at!(i + 2) == 'b'
-                    {
-                        tokens.push(Token::KeywordPub);
-                        i += 3;
-                    } else {
-                        if c.is_alphabetic() {
-                            let identifier_begin = i;
-                            i += 1;
-                            'identifier_loop: while let Some(c) = code.chars().nth(i) {
-                                if c.is_alphanumeric() || c == '_' {
-                                    i += 1;
-                                    // If there are no characters left after identifier, push the identifier
-                                    if i >= code_chars_count {
-                                        tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                        break 'identifier_loop;
-                                    }
-                                } else {
-                                    tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                    i -= 1;
-                                    break 'identifier_loop;
-                                }
-                            }
-                        }
-                    }
-                }
-                't' => {
-                    // If the following characters result in "true"
-                    if (i + 3) < code_chars_count
-                        && char_at!(i + 1) == 'r'
-                        && char_at!(i + 2) == 'u'
-                        && char_at!(i + 3) == 'e'
-                    {
-                        tokens.push(Token::LiteralBoolTrue);
-                        i += 4;
-                        continue;
-                    } else {
-                        if c.is_alphabetic() {
-                            let identifier_begin = i;
-                            i += 1;
-                            'identifier_loop: while let Some(c) = code.chars().nth(i) {
-                                if c.is_alphanumeric() || c == '_' {
-                                    i += 1;
-                                    // If there are no characters left after identifier, push the identifier
-                                    if i >= code_chars_count {
-                                        tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                        break 'identifier_loop;
-                                    }
-                                } else {
-                                    tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                    i -= 1;
-                                    break 'identifier_loop;
-                                }
-                            }
-                        }
-                    }
-                }
-                _ => {
-                    if c.is_alphabetic() {
-                        let identifier_begin = i;
-                        i += 1;
-                        'identifier_loop: while let Some(c) = code.chars().nth(i) {
-                            if c.is_alphanumeric() || c == '_' {
-                                i += 1;
-                                // If there are no characters left after identifier, push the identifier
-                                if i >= code_chars_count {
-                                    tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                    break 'identifier_loop;
-                                }
-                            } else {
-                                tokens.push(Token::Identifier(&code[identifier_begin..i]));
-                                i -= 1;
-                                break 'identifier_loop;
-                            }
-                        }
-                    }
+        let c = char_at!(i);
+
+        match c {
+            '}' => {
+                tokens.push(Token::OperatorBraceClose);
+                i += 1;
+            }
+            '{' => {
+                tokens.push(Token::OperatorBraceOpen);
+                i += 1;
+            }
+            ')' => {
+                tokens.push(Token::OperatorParenthesisClose);
+                i += 1;
+            }
+            '(' => {
+                tokens.push(Token::OperatorParenthesisOpen);
+                i += 1;
+            }
+            '=' => {
+                // If the following character results in "=="
+                if (i + 1) < code_chars_count && char_at!(i + 1) == '=' {
+                    tokens.push(Token::OperatorEquality);
+                    i += 2;
+                } else {
+                    tokens.push(Token::Assignment);
+                    i += 1;
                 }
             }
-            i += 1;
+            _ => {
+                // If the character is a letter
+                if c.is_alphabetic() {
+                    let mut identifier_len = 0;
+                    while let Some(c) = code.chars().nth(i + identifier_len) {
+                        if c.is_alphanumeric() || c == '_' {
+                            identifier_len += 1;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if identifier_len > 0 {
+                        let identifier = &code[i..i + identifier_len];
+                        match identifier {
+                            "false" => tokens.push(Token::LiteralBoolFalse),
+                            "if" => tokens.push(Token::KeywordIf),
+                            "proc" => tokens.push(Token::KeywordProc),
+                            "pub" => tokens.push(Token::KeywordPub),
+                            "true" => tokens.push(Token::LiteralBoolTrue),
+                            _ => tokens.push(Token::Identifier(identifier)),
+                        }
+                        i += identifier_len;
+                        continue;
+                    }
+                }
+                i += 1;
+            }
         }
     }
     tokens
@@ -214,6 +118,27 @@ mod tokenization_test {
         assert_eq!(tokens[4], Token::OperatorBraceOpen);
         assert_eq!(tokens[5], Token::LiteralBoolFalse);
         assert_eq!(tokens[6], Token::OperatorBraceClose);
+    }
+    #[test]
+    fn should_tokenize_equality_operator() {
+        // Equality operator
+        let tokens = tokenize("==");
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens[0], Token::OperatorEquality);
+
+        // Equality operator with identifier
+        let tokens = tokenize("a==b");
+        assert_eq!(tokens.len(), 3);
+        assert_eq!(tokens[0], Token::Identifier("a"));
+        assert_eq!(tokens[1], Token::OperatorEquality);
+        assert_eq!(tokens[2], Token::Identifier("b"));
+
+        // Equality operator with identifier and whitespaces
+        let tokens = tokenize("a == b");
+        assert_eq!(tokens.len(), 3);
+        assert_eq!(tokens[0], Token::Identifier("a"));
+        assert_eq!(tokens[1], Token::OperatorEquality);
+        assert_eq!(tokens[2], Token::Identifier("b"));
     }
     #[test]
     fn should_tokenize_identifier() {
