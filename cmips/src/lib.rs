@@ -1,3 +1,15 @@
+pub enum AST<'a> {
+    FunctionDefinition {
+        access_specifier: ASTAccessSpecifier,
+        name: &'a str,
+    },
+}
+#[derive(Debug, PartialEq)]
+pub enum ASTAccessSpecifier {
+    Private,
+    Public,
+}
+
 #[derive(Debug, PartialEq)]
 pub enum Token<'a> {
     Assignment,
@@ -14,10 +26,56 @@ pub enum Token<'a> {
     OperatorParenthesisOpen,
 }
 
+pub fn parse<'a>(tokens: &Vec<Token<'a>>) -> Result<Vec<AST<'a>>, String> {
+    let mut ast = Vec::new();
+    let mut i = 0;
+    while i < tokens.len() {
+        match tokens[i] {
+            Token::KeywordProc => {
+                if let Token::Identifier(name) = tokens[i + 1] {
+                    if tokens[i + 2] == Token::OperatorParenthesisOpen
+                        && tokens[i + 3] == Token::OperatorParenthesisClose
+                        && tokens[i + 4] == Token::OperatorBraceOpen
+                    {
+                        ast.push(AST::FunctionDefinition {
+                            access_specifier: ASTAccessSpecifier::Private,
+                            name,
+                        });
+                        i += 5;
+                        continue;
+                    }
+                } else {
+                    return Err(format!("Expected identifier after 'proc' keyword"));
+                }
+            }
+            Token::KeywordPub => {
+                if tokens[i + 1] == Token::KeywordProc {
+                    if let Token::Identifier(name) = tokens[i + 2] {
+                        if tokens[i + 3] == Token::OperatorParenthesisOpen
+                            && tokens[i + 4] == Token::OperatorParenthesisClose
+                            && tokens[i + 5] == Token::OperatorBraceOpen
+                        {
+                            ast.push(AST::FunctionDefinition {
+                                access_specifier: ASTAccessSpecifier::Public,
+                                name,
+                            });
+                            i += 6;
+                            continue;
+                        }
+                    } else {
+                        return Err(format!("Expected identifier after 'proc' keyword"));
+                    }
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    Ok(ast)
+}
 pub fn tokenize(code: &str) -> Vec<Token> {
     let code_chars_count = code.chars().count();
 
-    let mut i = 0;
     // The vector is initialized with the exact capacity needed to avoid
     // reallocations. Because characters are parsed into tokens, the number
     // of tokens will always be less than or equal to the number of characters.
@@ -29,11 +87,8 @@ pub fn tokenize(code: &str) -> Vec<Token> {
         };
     }
 
-    loop {
-        if i >= code_chars_count {
-            break;
-        }
-
+    let mut i = 0;
+    while i < code_chars_count {
         let c = char_at!(i);
 
         match c {
@@ -97,7 +152,44 @@ pub fn tokenize(code: &str) -> Vec<Token> {
 }
 
 #[cfg(test)]
-mod tokenization_test {
+mod parsing_tests {
+    use super::*;
+
+    #[test]
+    fn should_parse_function_definition() {
+        // Function definition without parameters and empty body.
+        let tokens = tokenize("proc main(){}");
+        let ast = parse(&tokens).unwrap();
+        assert_eq!(ast.len(), 1);
+        if let AST::FunctionDefinition {
+            access_specifier,
+            name,
+        } = &ast[0]
+        {
+            assert_eq!(access_specifier, &ASTAccessSpecifier::Private);
+            assert_eq!(name, &"main");
+        } else {
+            panic!("Expected AST::FunctionDefinition");
+        }
+
+        // Public function definition without parameters and empty body.
+        let tokens = tokenize("pub proc main(){}");
+        let ast = parse(&tokens).unwrap();
+        assert_eq!(ast.len(), 1);
+        if let AST::FunctionDefinition {
+            access_specifier,
+            name,
+        } = &ast[0]
+        {
+            assert_eq!(access_specifier, &ASTAccessSpecifier::Public);
+            assert_eq!(name, &"main");
+        } else {
+            panic!("Expected AST::FunctionDefinition");
+        }
+    }
+}
+#[cfg(test)]
+mod tokenization_tests {
     use super::*;
 
     #[test]
