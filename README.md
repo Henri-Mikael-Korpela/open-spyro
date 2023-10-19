@@ -18,7 +18,9 @@ This project will not contain any game data in its original form. You must have 
 
 The project is currently in its early stages. Port is currently unplayable. Some of the MIPS assembly code has been disassembled with comments and labels added. Disassembly is in a completely custom assembly, the repository even has its own assembler and disassembler! This custom assembler and disassembler ought to have more documentation, but it is still in the works.
 
-The project is currently focused on reverse-engineering the MIPS assembly and understanding how the data is layed out on the ROM. Some tools have been built along the way, like a working ROM file replacer, which is used for saving Playstation executable files back into the ROM file. Some work has been started on reading WAD files, but it is in its early stages.
+The project is currently focused on reverse-engineering the MIPS assembly and understanding how the data is layed out on the ROM. I am still learning MIPS assembly works, how assembly works in general (now having trouble understanding how to decode/encode j instructions and how stack works for storing local variables). Some tools have been built along the way, like a working ROM file replacer, which is used for saving Playstation executable files back into the ROM file. Some work has been started on reading WAD files, but it is in its early stages.
+
+While learning MIPS assembly and thinking about decompilation, I decided to start working on a custom programming language for aiding reverse engineering seriously. I could use C, but I was having trouble linking stuff and I didn't want to bother with linker scripts and stuff. I have already built tokenization, basic parsing for functions, variable initialization and support for some built-in return types and values. Assembly to MIPS and compilation to MIPS processor compatible machine code still WIP. This custom compiler will be added to this repository as a separate crate once there's enough significant progress made. `cmips` crate is a separate attempt, it will be replaced eventually.
 
 ROM currently worked on is an NTSC version. I have not worked on any other versions yet.
 
