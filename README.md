@@ -26,15 +26,15 @@ ROM currently worked on is an NTSC version. I have not worked on any other versi
 
 Here's a list CLI commands currently supported:
 
-* `generate-doc`
-* `mips-assemble`
-* `mips-disassemble`
-* `ps1exe-assemble`
-* `ps1exe-disassemble`
-* `rom-check`
-* `rom-extract`
-* `rom-replace`
-* `wad-read`
+* `generate-doc` Generates README.md file describing the project at project root.
+* `mips-assemble` Converts MIPS assembly instruction into machine code (as hexadecimal) and into LE bytes also.
+* `mips-disassemble` Converts machine code into an MIPS assembly instruction string.
+* `ps1exe-assemble` Assembles MIPS assembly code from a given text file into a Playstation executable.
+* `ps1exe-disassemble` Disassembles a section of MIPS assembly code from a given Playstation executable binary.
+* `rom-check` Checks the given ROM file structure for correctness.
+* `rom-extract` Extracts a file from a ROM to a given extract path.
+* `rom-replace` Replaces a file in a given ROM with a given input file.
+* `wad-read` Reads information about WAD file. Heavily WIP.
 
 ## Disclaimer
 

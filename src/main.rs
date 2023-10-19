@@ -21,7 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let command_args = &args[2..];
 
-    for (command_name, command_function) in COMMANDS.iter() {
+    for (command_name, _, command_function) in COMMANDS.iter() {
         if command == *command_name {
             // Requested command found, execute it.
             return command_function(command_args);
@@ -52,17 +52,18 @@ macro_rules! get_arg {
 
 const COMMANDS: &[(
     &str,
+    &str,
     fn(args: &[String]) -> Result<(), Box<dyn std::error::Error>>,
 )] = &[
-    ("generate-doc", generate_doc),
-    ("mips-assemble", mips_assemble),
-    ("mips-disassemble", mips_disassemble),
-    ("ps1exe-assemble", ps1exe_assemble),
-    ("ps1exe-disassemble", ps1exe_disassemble),
-    ("rom-check", rom_check),
-    ("rom-extract", rom_extract),
-    ("rom-replace", rom_replace),
-    ("wad-read", wad_read),
+    ("generate-doc", "Generates README.md file describing the project at project root.", generate_doc),
+    ("mips-assemble", "Converts MIPS assembly instruction into machine code (as hexadecimal) and into LE bytes also.", mips_assemble),
+    ("mips-disassemble", "Converts machine code into an MIPS assembly instruction string.", mips_disassemble),
+    ("ps1exe-assemble", "Assembles MIPS assembly code from a given text file into a Playstation executable.", ps1exe_assemble),
+    ("ps1exe-disassemble", "Disassembles a section of MIPS assembly code from a given Playstation executable binary.", ps1exe_disassemble),
+    ("rom-check", "Checks the given ROM file structure for correctness.", rom_check),
+    ("rom-extract", "Extracts a file from a ROM to a given extract path.", rom_extract),
+    ("rom-replace", "Replaces a file in a given ROM with a given input file.", rom_replace),
+    ("wad-read", "Reads information about WAD file. Heavily WIP.", wad_read),
 ];
 
 fn generate_doc(_args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
@@ -84,7 +85,7 @@ fn generate_doc(_args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     // Initialize all the elements of the README.md file.
     let mut commands = COMMANDS
         .iter()
-        .map(|(name, _)| code(name))
+        .map(|(name, description, _)| format!("{} {}", code(name), description))
         .collect::<Vec<_>>();
     // Ensure all commands are sorted alphabetically.
     commands.sort();
@@ -192,7 +193,7 @@ fn mips_disassemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
         .into()),
     }
 }
-/// Assemble MIPS assembly code from a given text file into a Playstation executable
+/// Assembles MIPS assembly code from a given text file into a Playstation executable.
 fn ps1exe_assemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     let input_assembly_code_file_path = get_arg!(args, 0, "input assembly code file path")?;
     let input_ps1_exe_file_path = get_arg!(args, 1, "input PS1 EXE file path")?;
@@ -512,7 +513,7 @@ fn ps1exe_disassemble(args: &[String]) -> Result<(), Box<dyn std::error::Error>>
 
     Ok(())
 }
-// Checks the given ROM file for validity.
+/// Checks the given ROM file structure for correctness.
 fn rom_check(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     let rom_path = get_arg!(args, 0, "ROM path")?;
 
@@ -665,7 +666,7 @@ fn rom_check(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     println!("ROM validity checks passed. ROM includes valid data.");
     Ok(())
 }
-/// Extracts a file from a given ROM to a given extract path.
+/// Extracts a file from a ROM to a given extract path.
 fn rom_extract(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     let rom_path = get_arg!(args, 0, "ROM path")?;
     let entry_input_path = get_arg!(args, 1, "entry input path")?;
@@ -822,6 +823,7 @@ fn rom_replace(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     );
     Ok(())
 }
+/// Reads information about WAD file. Heavily WIP.
 fn wad_read(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     let wad_path = get_arg!(args, 0, "WAD path")?;
 
