@@ -19,7 +19,7 @@ pub struct PS1Exe {
 }
 impl PS1Exe {
     const CODE_AND_DATA_BEGIN_OFFSET: u32 = 0x800; // 0x800 = 2048
-    const PS1_EXE_NAME: &str = "Playstation executable file";
+    const PS1_EXE_NAME: &'static str = "Playstation executable file";
     const VALID_MULTIPLIER: usize = 2048;
 
     fn from_bytes(value: Vec<u8>) -> Result<Self, String> {
