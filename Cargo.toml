@@ -5,11 +5,10 @@ edition = "2021"
 
 [dependencies]
 colored = "2.0.4"
-cmips = { path = "./cmips" }
 mips = { path = "./mips" }
 ps1exe = { path = "./ps1exe" }
 rom_manager = { path = "./rom_manager" }
 wad = { path = "./wad" }
 
 [workspace]
-members = ["cmips", "mips", "ps1exe", "rom_manager", "wad"]
+members = ["mips", "ps1exe", "rom_manager", "wad"]
