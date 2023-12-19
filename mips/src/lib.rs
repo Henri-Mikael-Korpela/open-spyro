@@ -4,8 +4,8 @@ macro_rules! define_i_signed_instruction_parse {
     ($parts:ident, $opcode:literal) => {
         match $parts[1..] {
             [rt, rs, immediate] => {
-                let rt = parse_register(rt).map_err(|e| e.to_string())?;
-                let rs = parse_register(rs).map_err(|e| e.to_string())?;
+                let rt = parse_register_value(rt).map_err(|e| e.to_string())?;
+                let rs = parse_register_value(rs).map_err(|e| e.to_string())?;
                 let immediate = parse_immediate_signed(immediate).map_err(|e| e.to_string())?;
                 Ok(Instruction::ISigned {
                     opcode: $opcode,
@@ -15,7 +15,7 @@ macro_rules! define_i_signed_instruction_parse {
                 })
             }
             [rt, relative_value] => {
-                let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
 
                 let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
 
@@ -35,7 +35,7 @@ macro_rules! define_i_signed_instruction_parse {
                     )
                 });
                 let rs = rs.replace(")", "");
-                let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+                let rs = parse_register_value(&rs).unwrap_or_else(|e| panic!("{}", e));
 
                 Ok(Instruction::ISigned {
                     opcode: $opcode,
@@ -52,8 +52,8 @@ macro_rules! define_i_unsigned_instruction_parse {
     ($parts:ident, $opcode:literal) => {
         match $parts[1..] {
             [rt, rs, immediate] => {
-                let rs = parse_register(rs).map_err(|e| e.to_string())?;
-                let rt = parse_register(rt).map_err(|e| e.to_string())?;
+                let rs = parse_register_value(rs).map_err(|e| e.to_string())?;
+                let rt = parse_register_value(rt).map_err(|e| e.to_string())?;
                 let immediate = parse_immediate_unsigned(immediate).map_err(|e| e.to_string())?;
                 Ok(Instruction::IUnsigned {
                     opcode: $opcode,
@@ -63,7 +63,7 @@ macro_rules! define_i_unsigned_instruction_parse {
                 })
             }
             [rt, relative_value] => {
-                let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
 
                 let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
 
@@ -83,7 +83,7 @@ macro_rules! define_i_unsigned_instruction_parse {
                     )
                 });
                 let rs = rs.replace(")", "");
-                let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+                let rs = parse_register_value(&rs).unwrap_or_else(|e| panic!("{}", e));
 
                 Ok(Instruction::IUnsigned {
                     opcode: $opcode,
@@ -100,9 +100,9 @@ macro_rules! define_r_instruction_parse {
     ($parts:ident, $funct:literal) => {
         match $parts[1..] {
             [rd, rs, rt] => {
-                let rd = parse_register(rd).map_err(|e| e.to_string())?;
-                let rs = parse_register(rs).map_err(|e| e.to_string())?;
-                let rt = parse_register(rt).map_err(|e| e.to_string())?;
+                let rd = parse_register_value(rd).map_err(|e| e.to_string())?;
+                let rs = parse_register_value(rs).map_err(|e| e.to_string())?;
+                let rt = parse_register_value(rt).map_err(|e| e.to_string())?;
                 Ok(Instruction::R {
                     opcode: 0,
                     rs,
@@ -280,8 +280,8 @@ impl Instruction {
                 [rs, rt, address] => {
                     Ok(Instruction::ISigned {
                         opcode: 0b000100, // Opcode is 4
-                        rs: parse_register(rs).unwrap_or_else(|e| panic!("{}", e)),
-                        rt: parse_register(rt).unwrap_or_else(|e| panic!("{}", e)),
+                        rs: parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e)),
+                        rt: parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e)),
                         immediate: parse_immediate_signed(address)
                             .unwrap_or_else(|e| panic!("{}", e)),
                     })
@@ -290,7 +290,7 @@ impl Instruction {
             },
             "bgtz" => match parts[1..] {
                 [rs, address] => {
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_signed(address).unwrap_or_else(|e| panic!("{}", e));
 
@@ -305,7 +305,7 @@ impl Instruction {
             },
             "blez" => match parts[1..] {
                 [rs, address] => {
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_signed(address).unwrap_or_else(|e| panic!("{}", e));
 
@@ -320,7 +320,7 @@ impl Instruction {
             },
             "bltz" => match parts[1..] {
                 [rs, address] => {
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_signed(address).unwrap_or_else(|e| panic!("{}", e));
 
@@ -337,8 +337,8 @@ impl Instruction {
                 [rs, rt, address] => {
                     Ok(Instruction::ISigned {
                         opcode: 0b000101, // Opcode is 5
-                        rs: parse_register(rs).unwrap_or_else(|e| panic!("{}", e)),
-                        rt: parse_register(rt).unwrap_or_else(|e| panic!("{}", e)),
+                        rs: parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e)),
+                        rt: parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e)),
                         immediate: parse_immediate_signed(address)
                             .unwrap_or_else(|e| panic!("{}", e)),
                     })
@@ -365,8 +365,8 @@ impl Instruction {
             },
             "jalr" => match parts[1..] {
                 [rd, rs] => {
-                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rd = parse_register_value(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::R {
                         opcode: 0b000000, // Opcode is 0
                         rs,
@@ -382,7 +382,7 @@ impl Instruction {
                 [rs] => {
                     Ok(Instruction::R {
                         opcode: 0b000000, // Opcode is 0
-                        rs: parse_register(rs).unwrap_or_else(|e| panic!("{}", e)),
+                        rs: parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e)),
                         rt: 0,
                         rd: 0,
                         shamt: 0,
@@ -393,8 +393,8 @@ impl Instruction {
             },
             "lb" => match parts[1..] {
                 [rt, immediate, rs] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::ISigned {
@@ -405,7 +405,7 @@ impl Instruction {
                     })
                 }
                 [rt, relative_value] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
 
                     let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
 
@@ -425,7 +425,7 @@ impl Instruction {
                         )
                     });
                     let rs = rs.replace(")", "");
-                    let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(&rs).unwrap_or_else(|e| panic!("{}", e));
 
                     Ok(Instruction::ISigned {
                         opcode: 0b100000, // Opcode is 32
@@ -438,8 +438,8 @@ impl Instruction {
             },
             "lbu" => match parts[1..] {
                 [rt, immediate, rs] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_unsigned(immediate).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::IUnsigned {
@@ -450,7 +450,7 @@ impl Instruction {
                     })
                 }
                 [rt, relative_value] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
 
                     let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
 
@@ -470,7 +470,7 @@ impl Instruction {
                         )
                     });
                     let rs = rs.replace(")", "");
-                    let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(&rs).unwrap_or_else(|e| panic!("{}", e));
 
                     Ok(Instruction::IUnsigned {
                         opcode: 0b100100, // Opcode is 36
@@ -485,7 +485,7 @@ impl Instruction {
             "lhu" => define_i_unsigned_instruction_parse!(parts, 0b100101), // Opcode is 37
             "lui" => match parts[1..] {
                 [rt, immediate] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_unsigned(immediate).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::IUnsigned {
@@ -499,8 +499,8 @@ impl Instruction {
             },
             "lw" => match parts[1..] {
                 [rt, immediate, rs] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::ISigned {
@@ -511,7 +511,7 @@ impl Instruction {
                     })
                 }
                 [rt, relative_value] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
 
                     let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
 
@@ -531,7 +531,7 @@ impl Instruction {
                         )
                     });
                     let rs = rs.replace(")", "");
-                    let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(&rs).unwrap_or_else(|e| panic!("{}", e));
 
                     Ok(Instruction::ISigned {
                         opcode: 0b100011, // Opcode is 35
@@ -544,7 +544,7 @@ impl Instruction {
             },
             "mfhi" => match parts[1..] {
                 [rd] => {
-                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rd = parse_register_value(rd).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::R {
                         opcode: 0,
                         rs: 0,
@@ -558,7 +558,7 @@ impl Instruction {
             },
             "mflo" => match parts[1..] {
                 [rd] => {
-                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rd = parse_register_value(rd).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::R {
                         opcode: 0,
                         rs: 0,
@@ -572,8 +572,8 @@ impl Instruction {
             },
             "mult" => match parts[1..] {
                 [rs, rt] => {
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::R {
                         opcode: 0,
                         rs,
@@ -591,8 +591,8 @@ impl Instruction {
             "ori" => define_i_signed_instruction_parse!(parts, 0b001101), // Opcode is 13
             "sb" => match parts[1..] {
                 [rt, immediate, rs] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::ISigned {
@@ -603,7 +603,7 @@ impl Instruction {
                     })
                 }
                 [rt, relative_value] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
 
                     let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
 
@@ -623,7 +623,7 @@ impl Instruction {
                         )
                     });
                     let rs = rs.replace(")", "");
-                    let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(&rs).unwrap_or_else(|e| panic!("{}", e));
 
                     Ok(Instruction::ISigned {
                         opcode: 0b101000, // Opcode is 40
@@ -637,8 +637,8 @@ impl Instruction {
             "sh" => define_i_signed_instruction_parse!(parts, 0b101001), // Opcode is 41
             "sll" => match parts[1..] {
                 [rd, rt, shamt] => {
-                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rd = parse_register_value(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
                     let shamt =
                         parse_immediate_unsigned(shamt).unwrap_or_else(|e| panic!("{}", e)) as u8;
                     Ok(Instruction::R {
@@ -659,8 +659,8 @@ impl Instruction {
             "sltu" => define_r_instruction_parse!(parts, 0b101011), // Funct is 43
             "sra" => match parts[1..] {
                 [rd, rt, shamt] => {
-                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rd = parse_register_value(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
                     let shamt =
                         parse_immediate_unsigned(shamt).unwrap_or_else(|e| panic!("{}", e)) as u8;
                     Ok(Instruction::R {
@@ -676,8 +676,8 @@ impl Instruction {
             },
             "srl" => match parts[1..] {
                 [rd, rt, shamt] => {
-                    let rd = parse_register(rd).unwrap_or_else(|e| panic!("{}", e));
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rd = parse_register_value(rd).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
                     let shamt =
                         parse_immediate_unsigned(shamt).unwrap_or_else(|e| panic!("{}", e)) as u8;
                     Ok(Instruction::R {
@@ -695,8 +695,8 @@ impl Instruction {
             "subu" => define_r_instruction_parse!(parts, 0b100011), // Funct is 35
             "sw" => match parts[1..] {
                 [rt, immediate, rs] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
-                    let rs = parse_register(rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(rs).unwrap_or_else(|e| panic!("{}", e));
                     let immediate =
                         parse_immediate_signed(immediate).unwrap_or_else(|e| panic!("{}", e));
                     Ok(Instruction::ISigned {
@@ -707,7 +707,7 @@ impl Instruction {
                     })
                 }
                 [rt, relative_value] => {
-                    let rt = parse_register(rt).unwrap_or_else(|e| panic!("{}", e));
+                    let rt = parse_register_value(rt).unwrap_or_else(|e| panic!("{}", e));
 
                     let relative_value_parts = relative_value.split("(").collect::<Vec<_>>();
 
@@ -727,7 +727,7 @@ impl Instruction {
                         )
                     });
                     let rs = rs.replace(")", "");
-                    let rs = parse_register(&rs).unwrap_or_else(|e| panic!("{}", e));
+                    let rs = parse_register_value(&rs).unwrap_or_else(|e| panic!("{}", e));
 
                     Ok(Instruction::ISigned {
                         opcode: 0b101011, // Opcode is 43
@@ -910,6 +910,7 @@ impl Instruction {
     }
 }
 
+/// Parses an address used for a J (jump) instruction from a string.
 fn parse_address(content: &str) -> Result<u32, String> {
     if content.starts_with("0x") || content.starts_with("0X") {
         u32::from_str_radix(&content[2..], 16)
@@ -1018,6 +1019,18 @@ fn parse_i_unsigned_instruction(opcode: u8, machine_code: u32) -> Instruction {
         immediate,
     }
 }
+/// Parses a vector of nodes from MIPS assembly code as a string.
+///
+/// Parsing goes through assembly code line by line.
+/// Each line results in a node (except empty lines, which are skipped).
+/// All comments (starting with '#' character) are ignored.
+///
+/// # Examples
+///
+/// ```
+/// let nodes = parse_nodes("addiu sp, sp, 65496\nsw s0, 16(sp)");
+/// assert_eq!(nodes.len(), 2);
+/// ```
 pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
     let content_lines = content.split("\n");
 
@@ -1133,12 +1146,21 @@ pub fn parse_nodes(content: &str) -> Result<Vec<Node>, String> {
 }
 /// Parses a register from a string.
 ///
-/// The string must be in the format "$<register_number>".
-/// The register number must be between 0 and 31.
+/// The string must be in the format $<register_number> (like $1) or <register_name> (like "ra").
+/// The register number must be between 0 and 31 (a total of 32 possible registers).
 /// If the register number is out of range, an error is returned.
 /// If the string is not in the correct format, an error is returned.
 /// If the string is in the correct format and the register number is in range, the register number is returned.
-fn parse_register(content: &str) -> Result<u8, String> {
+///
+/// # Examples
+/// ```
+/// let register_number = parse_register_value("$0").unwrap();
+/// assert_eq!(register_number, 0);
+///
+/// let register_number = parse_register_value("ra").unwrap();
+/// assert_eq!(register_number, 31);
+/// ```
+fn parse_register_value(content: &str) -> Result<u8, String> {
     if content.starts_with("$") {
         let register_number = content[1..].parse::<u8>().unwrap();
         if register_number > 31 {
