@@ -62,6 +62,7 @@ const COMMANDS: &[(
     ("ps1exe-disassemble", "Disassembles a section of MIPS assembly code from a given Playstation executable binary.", ps1exe_disassemble),
     ("rom-check", "Checks the given ROM file structure for correctness.", rom_check),
     ("rom-extract", "Extracts a file from a ROM to a given extract path.", rom_extract),
+    ("rom-list", "Lists directories and files in a given ROM.", rom_list),
     ("rom-replace", "Replaces a file in a given ROM with a given input file.", rom_replace),
     ("wad-read", "Reads information about WAD file. Heavily WIP.", wad_read),
 ];
@@ -695,7 +696,7 @@ fn rom_extract(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
             )
         })?;
 
-    // Read the sub-records, that is, directories and files by the root directory record
+    // Read the sub-records, that is, directories and files by the root directory record.
     let sub_records = volume
         .read_directory_records(
             &pvd.directory_record_for_root_directory,
@@ -736,6 +737,54 @@ fn rom_extract(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
         "Successfully extracted file \"{}\" from ROM to \"{}\"",
         entry_input_path, entry_extract_path
     );
+    Ok(())
+}
+/// Lists directories and files in a given ROM.
+fn rom_list(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
+    let rom_path = get_arg!(args, 0, "ROM path")?;
+
+    // Initialize the volume based on given ROM file path.
+    let volume_file = File::open(rom_path)
+        .map_err(|_| format!("Failed to open given ROM file in path \"{}\".", rom_path))?;
+    let mut volume = CDROMXAVolume::new(volume_file);
+
+    // Read the volume descriptor locations from the volume.
+    let vd_locations = volume.read_volume_descriptor_locations().map_err(|e| {
+        format!(
+            "ROM file given has invalid data: failed to read volume descriptor locations: {}",
+            e.to_string()
+        )
+    })?;
+
+    let pvd = volume
+        .read_primary_volume_descriptor(&vd_locations)
+        .map_err(|e| {
+            format!(
+                "ROM file given has invalid data: failed to read primary volume descriptor: {}",
+                e.to_string()
+            )
+        })?;
+
+    // Read the sub-records, that is, directories and files by the root directory record.
+    let sub_records = volume
+        .read_directory_records(
+            &pvd.directory_record_for_root_directory,
+            pvd.logical_block_size,
+        )
+        .map_err(|err| {
+            format!(
+                "ROM file given has invalid data: failed to read sub-records by root directory: {}",
+                err.to_string()
+            )
+        })?;
+
+    println!("ROM path: \"{}\"", rom_path);
+    for record in sub_records.iter() {
+        let record_name = record.file_identifier_as_string();
+        if record_name.len() > 1 {
+            println!("{}", record_name);
+        }
+    }
     Ok(())
 }
 /// Replaces a file in a given ROM with a given input file.
