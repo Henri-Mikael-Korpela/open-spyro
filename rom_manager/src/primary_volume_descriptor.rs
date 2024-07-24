@@ -1,3 +1,5 @@
+use core::str;
+
 use crate::{byte_range::ByteRange, directory_record::DirectoryRecord, Unserialize};
 
 #[derive(Debug)]
@@ -25,17 +27,17 @@ impl PrimaryVolumeDescriptor {
     pub const APPLICATION_IDENTIFIER_RANGE: ByteRange = ByteRange::new(574, 702);
 
     pub fn try_from_buffer(buf: &[u8], offset_in_file: u64) -> Result<Self, String> {
-        const CD001: &'static str = "CD001";
-        const CD001_BYTES: &[u8] = CD001.as_bytes();
+        const CD001: &[u8] = b"CD001";
         const OFFSET_FROM_DESCRIPTOR_TYPE: usize = 1;
 
         let descriptor_buf_cd001 =
-            &buf[OFFSET_FROM_DESCRIPTOR_TYPE..OFFSET_FROM_DESCRIPTOR_TYPE + CD001_BYTES.len()];
+            &buf[OFFSET_FROM_DESCRIPTOR_TYPE..OFFSET_FROM_DESCRIPTOR_TYPE + CD001.len()];
 
-        if *CD001_BYTES != *descriptor_buf_cd001 {
+        if *CD001 != *descriptor_buf_cd001 {
+            let cd001_text = unsafe { str::from_utf8_unchecked(CD001) };
             return Err(format!(
                 "Descriptor is missing its \"{}\" in file at offset {}",
-                CD001, offset_in_file
+                cd001_text, offset_in_file
             ));
         }
 

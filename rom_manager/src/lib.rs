@@ -186,10 +186,11 @@ impl CDROMXAVolume {
             ));
         };
 
-        Ok(PrimaryVolumeDescriptor::try_from_buffer(
+        let volume_descriptor = PrimaryVolumeDescriptor::try_from_buffer(
             &descriptor_buf,
             descriptor_location.descriptor_offset,
-        )?)
+        )?;
+        Ok(volume_descriptor)
     }
     pub fn read_volume_descriptor_locations(
         &mut self,
