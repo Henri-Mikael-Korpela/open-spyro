@@ -2,6 +2,10 @@ use std::ops::BitAnd;
 
 use crate::{byte_range::ByteRange, fields, Serialize, Unserialize};
 
+pub enum DirectoryRecordError {
+    NotEnoughBytes,
+}
+
 #[derive(Debug)]
 pub struct DirectoryRecord {
     /// Length of Directory Record (LEN_DR) (BP 1)
@@ -78,14 +82,11 @@ impl Serialize for DirectoryRecord {
         result
     }
 }
-impl Unserialize for DirectoryRecord {
-    fn unserialize(data: &[u8]) -> Result<Self, String> {
+impl Unserialize<DirectoryRecordError> for DirectoryRecord {
+    fn unserialize(data: &[u8]) -> Result<Self, DirectoryRecordError> {
         let len = data.len();
         if len < 34 {
-            return Err(format!(
-                "There are not enough bytes given to read a directory record (value given was {})",
-                len
-            ));
+            return Err(DirectoryRecordError::NotEnoughBytes);
         }
 
         let length = data[DirectoryRecord::LENGTH_POSITION];

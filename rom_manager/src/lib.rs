@@ -439,8 +439,8 @@ pub trait Serialize {
     where
         Self: Sized;
 }
-pub trait Unserialize {
-    fn unserialize(data: &[u8]) -> Result<Self, String>
+pub trait Unserialize<Err> {
+    fn unserialize(data: &[u8]) -> Result<Self, Err>
     where
         Self: Sized;
 }
