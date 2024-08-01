@@ -3,6 +3,7 @@ use std::env;
 use std::fs::{self, File, OpenOptions};
 use std::io::Read;
 
+use bin_manager;
 use mips::{parse_nodes, CustomCommand, NodeKind};
 use ps1exe::{PS1Exe, PS1ExeReader, PS1ExeWriteResult, PS1ExeWriter};
 use rom_manager::CDROMXAVolume;
@@ -55,6 +56,7 @@ const COMMANDS: &[(
     &str,
     fn(args: &[String]) -> Result<(), Box<dyn std::error::Error>>,
 )] = &[
+    ("bin-read-bytes", "Reads bytes from a binary file at a given offset and count.", bin_read_bytes),
     ("generate-doc", "Generates README.md file describing the project at project root.", generate_doc),
     ("mips-assemble", "Converts MIPS assembly instruction into machine code (as hexadecimal) and into LE bytes also.", mips_assemble),
     ("mips-disassemble", "Converts machine code into an MIPS assembly instruction string.", mips_disassemble),
@@ -67,6 +69,37 @@ const COMMANDS: &[(
     ("wad-read", "Reads information about WAD file. Heavily WIP.", wad_read),
 ];
 
+/// Reads bytes from a binary file at a given offset and count.
+fn bin_read_bytes(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
+    let file_path = get_arg!(args, 0, "file path")?;
+
+    let offset = get_arg!(args, 1, "offset")?;
+    let offset = offset.parse::<usize>().map_err(|_| {
+        format!(
+            "Failed to parse given offset \"{}\" as a number.",
+            offset
+        )
+    })?;
+
+    let count = get_arg!(args, 2, "count")?;
+    let count = count.parse::<usize>().map_err(|_| {
+        format!(
+            "Failed to parse given count \"{}\" as a number.",
+            count
+        )
+    })?;
+
+    let bytes = bin_manager::read_bytes_from_file(file_path, offset, count)
+        .map_err(|open_file_err| {
+            format!(
+                "Failed to read bytes from file \"{}\" at offset {} and count {}: {}",
+                file_path, offset, count, open_file_err
+            )
+        })?;
+
+    println!("{}", bytes.iter().map(|b| format!("0x{:x}", b)).collect::<Vec<_>>().join(", "));
+    Ok(())
+}
 fn generate_doc(_args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     #[inline]
     fn code(content: &str) -> String {

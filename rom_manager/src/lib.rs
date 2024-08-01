@@ -143,7 +143,7 @@ impl CDROMXAVolume {
                     }
                     Err(err) => {
                         return Err(format!(
-                            "Error occured while reading directory records: {}",
+                            "Error occured while reading directory records: {:?}",
                             err
                         ));
                     }
@@ -186,10 +186,8 @@ impl CDROMXAVolume {
             ));
         };
 
-        let volume_descriptor = PrimaryVolumeDescriptor::try_from_buffer(
-            &descriptor_buf,
-            descriptor_location.descriptor_offset,
-        )?;
+        let volume_descriptor = PrimaryVolumeDescriptor::try_from_buffer(&descriptor_buf)
+            .map_err(|err| format!("Failed to read primary volume descriptor: {:?}", err))?;
         Ok(volume_descriptor)
     }
     pub fn read_volume_descriptor_locations(

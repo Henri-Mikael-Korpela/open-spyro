@@ -1,9 +1,13 @@
-use core::str;
+use crate::{
+    byte_range::ByteRange,
+    directory_record::{DirectoryRecord, DirectoryRecordError},
+    Unserialize,
+};
 
-use crate::{byte_range::ByteRange, directory_record::{DirectoryRecord, DirectoryRecordError}, Unserialize};
-
+#[derive(Debug)]
 pub enum PrimaryVolumeDescriptorError {
     MissingCd001,
+    NotEnoughBytesInDirectoryRecord,
 }
 
 #[derive(Debug)]
@@ -29,8 +33,10 @@ impl PrimaryVolumeDescriptor {
     pub const DIRECTORY_RECORD_FOR_ROOT_DIRECTORY_RANGE: ByteRange = ByteRange::new(156, 190);
     pub const PUBLISHER_IDENTIFIER_RANGE: ByteRange = ByteRange::new(318, 446);
     pub const APPLICATION_IDENTIFIER_RANGE: ByteRange = ByteRange::new(574, 702);
-    
-    pub fn try_from_buffer(buf: &[u8], offset_in_file: u64) -> Result<Self, PrimaryVolumeDescriptorError> {
+
+    pub fn try_from_buffer(
+        buf: &[u8]
+    ) -> Result<Self, PrimaryVolumeDescriptorError> {
         const CD001: &[u8] = b"CD001";
         const OFFSET_FROM_DESCRIPTOR_TYPE: usize = 1;
 
@@ -38,7 +44,6 @@ impl PrimaryVolumeDescriptor {
             &buf[OFFSET_FROM_DESCRIPTOR_TYPE..OFFSET_FROM_DESCRIPTOR_TYPE + CD001.len()];
 
         if *CD001 != *descriptor_buf_cd001 {
-            let cd001_text = unsafe { str::from_utf8_unchecked(CD001) };
             return Err(PrimaryVolumeDescriptorError::MissingCd001);
         }
 
@@ -56,16 +61,11 @@ impl PrimaryVolumeDescriptor {
         let directory_record_for_root_directory =
             match DirectoryRecord::unserialize(&directory_record_for_root_directory) {
                 Ok(directory) => directory,
-                Err(err) => {
-                    match err {
-                        DirectoryRecordError::NotEnoughBytes => {
-                            return Err(format!(
-                                "Directory record for root directory is missing bytes in file at offset {}",
-                                offset_in_file
-                            ));
-                        }
+                Err(err) => match err {
+                    DirectoryRecordError::NotEnoughBytes => {
+                        return Err(PrimaryVolumeDescriptorError::NotEnoughBytesInDirectoryRecord);
                     }
-                }
+                },
             };
 
         let publisher_identifier = Self::PUBLISHER_IDENTIFIER_RANGE.read_as_string(buf);

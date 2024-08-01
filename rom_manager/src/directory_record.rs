@@ -2,6 +2,7 @@ use std::ops::BitAnd;
 
 use crate::{byte_range::ByteRange, fields, Serialize, Unserialize};
 
+#[derive(Debug)]
 pub enum DirectoryRecordError {
     NotEnoughBytes,
 }
