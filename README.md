@@ -28,6 +28,7 @@ ROM currently worked on is an NTSC version. I have not worked on any other versi
 
 Here's a list CLI commands currently supported:
 
+* `bin-read-bytes` Reads bytes from a binary file at a given offset and count.
 * `generate-doc` Generates README.md file describing the project at project root.
 * `mips-assemble` Converts MIPS assembly instruction into machine code (as hexadecimal) and into LE bytes also.
 * `mips-disassemble` Converts machine code into an MIPS assembly instruction string.
